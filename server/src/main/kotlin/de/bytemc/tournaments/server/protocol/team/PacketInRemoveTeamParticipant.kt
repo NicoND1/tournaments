@@ -15,6 +15,7 @@ import kotlin.concurrent.withLock
  * @author Nico_ND1
  */
 class PacketInRemoveTeamParticipant : BytePacket() {
+
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         val id = readUUID()
         val tournament = ServerTournamentAPI.instance.findTournament(id)
@@ -65,4 +66,5 @@ class PacketInRemoveTeamParticipant : BytePacket() {
         val packet = PacketOutRemoveTeamParticipant(tournament, team, participant)
         tournament.sendUnitPacket(packet, connection)
     }
+
 }

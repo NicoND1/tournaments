@@ -1,9 +1,8 @@
-package de.bytemc.tournaments.server.protocol.team
+package de.bytemc.tournaments.server.protocol.round.encounter
 
 import de.bytemc.tournaments.api.ITournament
-import de.bytemc.tournaments.api.TournamentParticipant
+import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.TournamentTeam
-import de.bytemc.tournaments.server.writeString
 import de.bytemc.tournaments.server.writeUUID
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
@@ -12,18 +11,16 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 /**
  * @author Nico_ND1
  */
-class PacketOutAddTeamParticipant(tournament: ITournament, team: TournamentTeam, participant: TournamentParticipant) :
+class PacketOutWinEncounter(tournament: ITournament, encounter: TournamentEncounter, winnerTeam: TournamentTeam) :
     BytePacket() {
 
     init {
         writeUUID(tournament.id())
-        buffer.writeInt(team.id)
-        writeUUID(participant.uuid)
-        writeString(participant.name)
+        buffer.writeInt(encounter.id)
+        buffer.writeInt(winnerTeam.id)
     }
 
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         return unit()
     }
-
 }

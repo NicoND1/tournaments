@@ -11,8 +11,13 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 /**
  * @author Nico_ND1
  */
-class PacketOutRemoveTeamParticipant : BytePacket {
-    constructor(tournament: ITournament, team: TournamentTeam, participant: TournamentParticipant) {
+class PacketOutRemoveTeamParticipant(
+    tournament: ITournament,
+    team: TournamentTeam,
+    participant: TournamentParticipant
+) : BytePacket() {
+
+    init {
         writeUUID(tournament.id())
         buffer.writeInt(team.id)
         writeUUID(participant.uuid)
@@ -21,4 +26,5 @@ class PacketOutRemoveTeamParticipant : BytePacket {
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         return unit()
     }
+
 }

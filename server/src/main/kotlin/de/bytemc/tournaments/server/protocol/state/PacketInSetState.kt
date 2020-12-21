@@ -12,6 +12,7 @@ import java.util.*
  * @author Nico_ND1
  */
 class PacketInSetState : BytePacket() {
+
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         val id = readUUID()
         val state = TournamentState.values()[buffer.readInt()]
@@ -23,4 +24,5 @@ class PacketInSetState : BytePacket() {
         val tournament = ServerTournamentAPI.instance.findTournament(id)
         return tournament?.setState(state) ?: false
     }
+
 }

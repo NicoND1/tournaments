@@ -10,6 +10,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
  * @author Nico_ND1
  */
 class PacketOutSetState : BytePacket {
+
     constructor(tournament: ITournament) {
         writeUUID(tournament.id())
         buffer.writeInt(tournament.state().ordinal)
@@ -20,4 +21,5 @@ class PacketOutSetState : BytePacket {
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         return unit()
     }
+
 }

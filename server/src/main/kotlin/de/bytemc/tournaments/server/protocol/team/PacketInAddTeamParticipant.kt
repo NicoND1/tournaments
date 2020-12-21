@@ -12,6 +12,7 @@ import kotlin.concurrent.withLock
  * @author Nico_ND1
  */
 class PacketInAddTeamParticipant : BytePacket() {
+
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         val id = readUUID()
         val tournament = ServerTournamentAPI.instance.findTournament(id)
@@ -53,4 +54,5 @@ class PacketInAddTeamParticipant : BytePacket() {
         val packet = PacketOutAddTeamParticipant(tournament, team, participant)
         tournament.sendUnitPacket(packet, connection)
     }
+
 }
