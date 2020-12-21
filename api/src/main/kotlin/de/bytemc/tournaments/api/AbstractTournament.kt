@@ -23,5 +23,4 @@ abstract class AbstractTournament(
 
     override fun currentRound() = currentRound
 
-
 }

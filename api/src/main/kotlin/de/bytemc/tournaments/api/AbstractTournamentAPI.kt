@@ -8,7 +8,7 @@ import kotlin.collections.ArrayList
  */
 abstract class AbstractTournamentAPI<Tournament> : ITournamentAPI<Tournament> where Tournament : ITournament {
 
-    private val tournaments: ArrayList<Tournament> = arrayListOf()
+    protected val tournaments: ArrayList<Tournament> = arrayListOf()
 
     override fun tournaments(): List<Tournament> {
         return ArrayList(tournaments)

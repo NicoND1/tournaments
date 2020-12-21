@@ -1,6 +1,7 @@
 package de.bytemc.tournaments.api
 
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.ceil
 import kotlin.math.log10
 import kotlin.math.pow
@@ -10,7 +11,9 @@ import kotlin.math.pow
  */
 data class TournamentCreator(val uuid: UUID, val name: String)
 
-data class TournamentTeam(val id: Int, val participants: List<TournamentParticipant>) {
+data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentParticipant>) {
+    val participantsLock = ReentrantLock()
+
     fun isEmpty() = participants.isEmpty()
 }
 
@@ -31,12 +34,12 @@ data class TournamentGame(
     val name: String,
     val color: String,
     val prettyName: String,
-    val teamsOptions: List<TournamentTeamsOption>
+    val teamsOptions: ArrayList<TournamentTeamsOption>
 )
 
 data class TournamentTeamsOption(
     val playersPerTeam: Int,
-    val mapPool: List<TournamentMap>,
+    val mapPool: ArrayList<TournamentMap>,
     val serviceGroupName: String
 )
 
