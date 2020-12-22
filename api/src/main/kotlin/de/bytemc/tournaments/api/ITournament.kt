@@ -21,4 +21,8 @@ interface ITournament {
 
     fun findTeam(id: Int): TournamentTeam?
 
+    fun findTeam(participantID: UUID): TournamentTeam?
+
+    fun isFull(): Boolean
+
 }

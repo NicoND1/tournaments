@@ -1,11 +1,9 @@
 package de.bytemc.tournaments.server.protocol.team
 
-import de.bytemc.tournaments.api.TournamentParticipant
-import de.bytemc.tournaments.api.TournamentTeam
-import de.bytemc.tournaments.api.readString
-import de.bytemc.tournaments.api.readUUID
+import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
-import de.bytemc.tournaments.server.*
+import de.bytemc.tournaments.server.ServerTournament
+import de.bytemc.tournaments.server.ServerTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -38,8 +36,12 @@ class PacketInAddTeamParticipant : BytePacket() {
     }
 
     private fun addToTeam(tournament: ServerTournament, team: TournamentTeam, connection: IConnection): Boolean {
-        val participant = TournamentParticipant(readUUID(), readString())
+        val participant = readParticipant()
         if (team.participants.contains(participant)) {
+            return false
+        }
+
+        if (team.participants.size == tournament.settings().teamsOption.playersPerTeam) {
             return false
         }
 
@@ -48,11 +50,22 @@ class PacketInAddTeamParticipant : BytePacket() {
         return true
     }
 
+    private fun readParticipant(): TournamentParticipant {
+        val uuid = readUUID()
+        val name = readString()
+
+        if (buffer.readBoolean()) {
+            val texture = PlayerTexture(readString(), readString())
+            return TournamentParticipant(uuid, name, texture)
+        }
+        return TournamentParticipant(uuid, name)
+    }
+
     private fun notifyExcept(
         tournament: ServerTournament,
         team: TournamentTeam,
         participant: TournamentParticipant,
-        connection: IConnection
+        connection: IConnection,
     ) {
         val packet = PacketOutAddTeamParticipant(tournament, team, participant)
         tournament.sendUnitPacket(packet, connection)

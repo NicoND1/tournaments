@@ -1,0 +1,10 @@
+{
+  "name": "tournaments",
+  "author": "Nico_ND1",
+  "mainClass": "de.bytemc.tournaments.server.TournamentsServerModule",
+  "moduleCopyType": "NONE",
+  "repositories": [],
+  "dependencies": [],
+  "depend": [],
+  "softDepend": []
+}

@@ -8,7 +8,7 @@ import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutWinEncount
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
-import de.bytemc.tournaments.server.command.TournamentCommand
+import de.bytemc.tournaments.server.command.TournamentDebugCommand
 import de.bytemc.tournaments.server.listener.ServicesListener
 import de.bytemc.tournaments.server.protocol.PacketInCreateTournament
 import de.bytemc.tournaments.server.protocol.PacketInDeleteTournament
@@ -32,7 +32,7 @@ class TournamentsServerModule : ICloudModule {
         CloudAPI.instance.getEventManager().registerListener(this, ServicesListener())
 
         registerPackets(CloudAPI.instance.getThisSidesCommunicationBootstrap().getPacketManager())
-        Launcher.instance.commandManager.registerCommand(this, TournamentCommand())
+        Launcher.instance.commandManager.registerCommand(this, TournamentDebugCommand())
 
         ServerTournamentAPI()
     }

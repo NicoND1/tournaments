@@ -25,4 +25,12 @@ abstract class AbstractTournament(
 
     override fun findTeam(id: Int) = teams.firstOrNull { it.id == id }
 
+    override fun findTeam(participantID: UUID): TournamentTeam? {
+        return teams.firstOrNull { it.participants.any { par -> par.uuid == participantID } }
+    }
+
+    override fun isFull(): Boolean {
+        return teams().all { team -> team.participants.size == settings().teamsOption.playersPerTeam }
+    }
+
 }

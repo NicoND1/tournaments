@@ -1,9 +1,6 @@
 package de.bytemc.tournaments.lobby.protocol.team
 
-import de.bytemc.tournaments.api.TournamentParticipant
-import de.bytemc.tournaments.api.TournamentTeam
-import de.bytemc.tournaments.api.readString
-import de.bytemc.tournaments.api.readUUID
+import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.lobby.LobbyTournament
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
@@ -38,13 +35,25 @@ class PacketInAddTeamParticipant : BytePacket() {
     }
 
     private fun addToTeam(team: TournamentTeam): Boolean {
-        val participant = TournamentParticipant(readUUID(), readString())
+        val participant = readParticipant()
         if (team.participants.contains(participant)) {
             return false
         }
 
         team.participantsLock.withLock { team.participants.add(participant) }
+        // TODO: Update inventories
         return true
+    }
+
+    private fun readParticipant(): TournamentParticipant {
+        val uuid = readUUID()
+        val name = readString()
+
+        if (buffer.readBoolean()) {
+            val texture = PlayerTexture(readString(), readString())
+            return TournamentParticipant(uuid, name, texture)
+        }
+        return TournamentParticipant(uuid, name)
     }
 
 }

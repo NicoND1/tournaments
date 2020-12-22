@@ -16,7 +16,7 @@ import eu.thesimplecloud.launcher.startup.Launcher
  * @author Nico_ND1
  */
 @Command(name = "tournamentdebug", commandType = CommandType.INGAME, permission = "", ["td"])
-class TournamentCommand : ICommandHandler {
+class TournamentDebugCommand : ICommandHandler {
 
     @CommandSubPath(path = "create <game> <teamsize> <teamamount>")
     fun create(

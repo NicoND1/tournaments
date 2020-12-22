@@ -29,7 +29,7 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         games as ArrayList<TournamentGame>
 
         val teamsOptions = MultiTeamsOptionReader().readOptions("BedWars") // TODO: Load all games
-        games.add(TournamentGame("BedWars", "§c", "BedWars", teamsOptions))
+        games.add(TournamentGame("BedWars", "§c", "BED", teamsOptions))
     }
 
     override fun allGames() = games

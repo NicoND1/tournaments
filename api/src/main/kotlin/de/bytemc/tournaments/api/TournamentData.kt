@@ -24,7 +24,8 @@ data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentPar
     }
 }
 
-data class TournamentParticipant(val uuid: UUID, val name: String)
+data class TournamentParticipant(val uuid: UUID, val name: String, val texture: PlayerTexture? = null)
+data class PlayerTexture(val value: String, val signature: String)
 
 data class TournamentSettings(
     val game: TournamentGame,
@@ -44,7 +45,7 @@ data class TournamentSettings(
 data class TournamentGame(
     val name: String,
     val color: String,
-    val prettyName: String,
+    val materialName: String,
     val teamsOptions: ArrayList<TournamentTeamsOption>,
 )
 

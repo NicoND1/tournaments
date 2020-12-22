@@ -16,6 +16,12 @@ class PacketOutAddTeamParticipant(tournament: ITournament, team: TournamentTeam,
         buffer.writeInt(team.id)
         writeUUID(participant.uuid)
         writeString(participant.name)
+
+        buffer.writeBoolean(participant.texture != null)
+        if (participant.texture != null) {
+            writeString(participant.texture!!.value)
+            writeString(participant.texture!!.signature)
+        }
     }
 
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {

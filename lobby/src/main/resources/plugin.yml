@@ -1,0 +1,8 @@
+name: tournaments
+author: Nico_ND1
+version: ${project.version}
+main: de.bytemc.tournaments.lobby.TournamentLobbyPlugin
+
+commands:
+    tournament:
+        aliases: [ tournaments ]

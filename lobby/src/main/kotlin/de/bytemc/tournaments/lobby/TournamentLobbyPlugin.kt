@@ -8,6 +8,7 @@ import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutWinEncount
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
+import de.bytemc.tournaments.lobby.command.TournamentCommand
 import de.bytemc.tournaments.lobby.protocol.PacketInCreateTournament
 import de.bytemc.tournaments.lobby.protocol.PacketInDeleteTournament
 import de.bytemc.tournaments.lobby.protocol.PacketInStartListening
@@ -30,6 +31,8 @@ class TournamentLobbyPlugin : JavaPlugin() {
 
         val api = LobbyTournamentAPI()
         api.sendPacket(PacketOutStartListening())
+
+        getCommand("tournament").executor = TournamentCommand()
     }
 
     private fun registerPackets(packetManager: IPacketManager) {
