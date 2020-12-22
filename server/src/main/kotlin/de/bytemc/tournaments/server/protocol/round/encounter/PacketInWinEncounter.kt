@@ -1,11 +1,10 @@
 package de.bytemc.tournaments.server.protocol.round.encounter
 
 import de.bytemc.tournaments.api.TournamentEncounter
-import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.server.ServerTournament
 import de.bytemc.tournaments.server.ServerTournamentAPI
+import de.bytemc.tournaments.server.encounter.setWinnerTeam
 import de.bytemc.tournaments.server.readUUID
-import de.bytemc.tournaments.server.sendUnitPacket
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -46,23 +45,16 @@ class PacketInWinEncounter : BytePacket() {
 
         return when {
             encounter.firstTeam.id == teamID -> {
-                encounter.winnerTeam = encounter.firstTeam
-                notifyWin(tournament, encounter, encounter.firstTeam)
+                encounter.setWinnerTeam(tournament, encounter.firstTeam)
                 success(true)
             }
             encounter.secondTeam.id == teamID -> {
-                encounter.winnerTeam = encounter.secondTeam
-                notifyWin(tournament, encounter, encounter.secondTeam)
+                encounter.setWinnerTeam(tournament, encounter.secondTeam)
                 success(true)
             }
             else -> {
                 failure(NullPointerException("Couldn't find winner team for $tournament $encounter $teamID"))
             }
         }
-    }
-
-    private fun notifyWin(tournament: ServerTournament, encounter: TournamentEncounter, winnerTeam: TournamentTeam) {
-        val packet = PacketOutWinEncounter(tournament, encounter, winnerTeam)
-        tournament.sendUnitPacket(packet)
     }
 }

@@ -3,7 +3,11 @@ package de.bytemc.tournaments.server
 import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.server.broadcast.BroadcastMessage
+import de.bytemc.tournaments.server.broadcast.primaryColor
+import de.bytemc.tournaments.server.broadcast.secondaryColor
+import de.bytemc.tournaments.server.protocol.round.encounter.PacketOutWinEncounter
 import eu.thesimplecloud.api.CloudAPI
+import eu.thesimplecloud.api.player.ICloudPlayer
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -43,4 +47,21 @@ fun BytePacket.writeString(string: String) {
 fun BytePacket.readString(): String {
     val length = buffer.readInt()
     return buffer.readBytes(length).toString(StandardCharsets.UTF_8)
+}
+
+fun TournamentEncounter.setWinnerTeam(tournament: ServerTournament, winnerTeam: TournamentTeam) {
+    this.winnerTeam = winnerTeam
+
+    tournament.sendUnitPacket(PacketOutWinEncounter(tournament, this, winnerTeam))
+    tournament.testRoundOver()
+}
+
+fun TournamentEncounter.handleError(tournament: ServerTournament) {
+    setWinnerTeam(tournament, firstTeam)
+    broadcast(object : BroadcastMessage {
+        override fun message(player: ICloudPlayer): String {
+            return "§cEuer Server für die ${player.secondaryColor()}Turnier Runde §ckonnte nicht gestartet werden.\n" +
+                    " §cDamit weiter gespielt werden kann, gewinnt ${player.primaryColor()}Team ${firstTeam.name()} §cautomatisch."
+        }
+    })
 }
