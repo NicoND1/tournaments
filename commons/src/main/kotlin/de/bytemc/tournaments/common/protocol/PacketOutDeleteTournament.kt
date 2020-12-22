@@ -15,7 +15,7 @@ class PacketOutDeleteTournament(tournamentID: UUID) : BytePacket() {
         writeUUID(tournamentID)
     }
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         return unit()
     }
 }

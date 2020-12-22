@@ -24,7 +24,7 @@ class PacketOutAddTeamParticipant(tournament: ITournament, team: TournamentTeam,
         }
     }
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         return unit()
     }
 

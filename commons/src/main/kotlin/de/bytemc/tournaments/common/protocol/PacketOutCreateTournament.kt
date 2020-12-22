@@ -35,7 +35,7 @@ class PacketOutCreateTournament : JsonPacket {
 
     constructor()
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         return unit()
     }
 }

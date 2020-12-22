@@ -22,7 +22,7 @@ class SelectGameInventory(
     3 * 9,
     "§lTurnier §8- §7Spielmodus",
     25, 24,
-    *IntStream.rangeClosed(9, 17).toArray()) {
+    *IntStream.rangeClosed(10, 16).toArray()) {
 
     init {
         design(player, 22, 0, 2)

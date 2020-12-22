@@ -74,6 +74,8 @@
   </distributionManagement>
 
   <build>
+    <finalName>tournaments-${project.name}-${project.version}</finalName>
+
     <plugins>
       <plugin>
         <groupId>org.jetbrains.kotlin</groupId>

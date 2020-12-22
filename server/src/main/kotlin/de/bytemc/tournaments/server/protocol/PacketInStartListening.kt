@@ -9,7 +9,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
  * @author Nico_ND1
  */
 class PacketInStartListening : BytePacket() {
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         ServerTournamentAPI.instance.startListening(connection)
         return unit()
     }

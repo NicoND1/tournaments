@@ -10,7 +10,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
  * @author Nico_ND1
  */
 class PacketInStartRound : BytePacket() {
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         val tournamentID = readUUID()
         val tournament = LobbyTournamentAPI.instance.findTournament(tournamentID)
             ?: return failure(NullPointerException("Couldn't find tournament $tournamentID"))

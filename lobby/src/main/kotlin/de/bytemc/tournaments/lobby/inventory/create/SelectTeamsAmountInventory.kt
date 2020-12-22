@@ -67,9 +67,9 @@ class SelectTeamsAmountInventory(
 
     private fun getName(increment: Boolean, step: Int): String {
         return if (increment) {
-            if (amount + step <= MAX_TEAMS) "§a+${step}" else "§c+${step}"
+            if (amount.get() + step <= MAX_TEAMS) "§a+${step}" else "§c+${step}"
         } else {
-            if (amount - step >= MIN_TEAMS) "§a-${step}" else "§c-${step}"
+            if (amount.get() - step >= MIN_TEAMS) "§a-${step}" else "§c-${step}"
         }
     }
 

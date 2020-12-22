@@ -19,7 +19,7 @@ class PacketOutSetState : BytePacket {
 
     constructor()
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         return unit()
     }
 

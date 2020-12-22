@@ -16,7 +16,7 @@ import java.util.*
  */
 class PacketInCreateTournament : JsonPacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         val id = jsonLib.getObject("id", UUID::class.java)
         val state = jsonLib.getObject("state", TournamentState::class.java)
         val creator = jsonLib.getObject("creator", TournamentCreator::class.java)

@@ -20,8 +20,10 @@ class MultiTeamsOptionReader {
         val file = File("/home/maps/$name")
         val serviceInfo = readServiceInfo(File(file, "service.properties"))
 
-        val files = file.listFiles { dir, _ -> dir?.isDirectory ?: false } ?: return result
+        val files = file.listFiles { pathname: File? -> pathname?.isDirectory ?: false } ?: return result
         for (listFile in files) {
+            if (listFile == null) continue
+
             val sizeName = listFile.name
 
             val maps: ArrayList<TournamentMap> = arrayListOf()

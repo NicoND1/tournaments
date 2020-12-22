@@ -13,7 +13,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
  */
 class PacketInWinEncounter : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Boolean> {
         val id = readUUID()
         val tournament = LobbyTournamentAPI.instance.findTournament(id)
 

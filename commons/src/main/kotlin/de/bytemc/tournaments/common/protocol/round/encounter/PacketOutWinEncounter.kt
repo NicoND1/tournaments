@@ -20,7 +20,7 @@ class PacketOutWinEncounter(tournament: ITournament, encounter: TournamentEncoun
         buffer.writeInt(winnerTeam.id)
     }
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<Unit> {
         return unit()
     }
 }

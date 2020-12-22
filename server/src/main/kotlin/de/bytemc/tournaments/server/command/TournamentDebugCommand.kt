@@ -4,6 +4,7 @@ import de.bytemc.tournaments.api.TournamentCreator
 import de.bytemc.tournaments.api.TournamentSettings
 import de.bytemc.tournaments.server.ServerTournamentAPI
 import de.bytemc.tournaments.server.command.suggestion.GameSuggestionProvider
+import eu.thesimplecloud.api.command.ICommandSender
 import eu.thesimplecloud.api.player.ICloudPlayer
 import eu.thesimplecloud.launcher.console.command.CommandType
 import eu.thesimplecloud.launcher.console.command.ICommandHandler
@@ -20,7 +21,7 @@ class TournamentDebugCommand : ICommandHandler {
 
     @CommandSubPath(path = "create <game> <teamsize> <teamamount>")
     fun create(
-        sender: ICloudPlayer,
+        sender: ICommandSender,
         @CommandArgument(name = "game", suggestionProvider = GameSuggestionProvider::class) gameName: String,
         @CommandArgument(name = "teamsize") teamSize: Int,
         @CommandArgument(name = "teamamount") teamsAmount: Int,
@@ -42,6 +43,7 @@ class TournamentDebugCommand : ICommandHandler {
             return
         }
 
+        sender as ICloudPlayer
         val creator = TournamentCreator(sender.getUniqueId(), sender.getName())
         val settings = TournamentSettings(game, teamsOption.mapPool, teamsOption, teamsAmount)
 
