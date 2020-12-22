@@ -15,4 +15,6 @@ interface ITournamentAPI<Tournament> where Tournament : ITournament {
 
     fun findTournamentByCreator(creatorUUID: UUID): Tournament?
 
+    fun allGames(): List<TournamentGame>
+
 }
