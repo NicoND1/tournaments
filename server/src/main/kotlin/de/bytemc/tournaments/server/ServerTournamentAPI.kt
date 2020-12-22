@@ -1,13 +1,15 @@
 package de.bytemc.tournaments.server
 
-import de.bytemc.tournaments.api.AbstractTournamentAPI
-import de.bytemc.tournaments.api.TournamentCreator
+import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.server.protocol.PacketOutCreateTournament
+import de.bytemc.tournaments.server.protocol.round.PacketOutStartRound
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.CommunicationPromise
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
+import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
 
 /**
@@ -20,8 +22,21 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
 
     private val listeningConnections: ArrayList<IConnection> = arrayListOf()
 
-    fun createTournament(creator: TournamentCreator): ServerTournament? {
-        TODO()
+    fun createTournament(creator: TournamentCreator, settings: TournamentSettings): ServerTournament? {
+        if (findTournamentByCreator(creator.uuid) != null) {
+            return null
+        }
+
+        val id = UUID.randomUUID()
+        val teams: ArrayList<TournamentTeam> = ArrayList(settings.teamsAmount)
+        for (i in 0..settings.teamsAmount) {
+            teams.add(TournamentTeam(i, arrayListOf()))
+        }
+
+        val tournament = ServerTournament(id, creator, settings, teams)
+        creationLock.withLock { tournaments.add(tournament) }
+        sendUnitPacket(PacketOutCreateTournament(tournament))
+        return tournament
     }
 
     fun startListening(connection: IConnection) {
@@ -29,8 +44,10 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
 
         for (tournament in tournaments) {
             connection.sendUnitQuery(PacketOutCreateTournament(tournament))
+            if (tournament.state() == TournamentState.PLAYING && tournament.currentRound() != null) {
+                connection.sendUnitQuery(PacketOutStartRound(tournament, tournament.currentRound()!!))
+            }
         }
-        TODO("Send all tournaments")
     }
 
     fun stopListening(connection: IConnection) {
@@ -47,7 +64,7 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         return sendUnitPacket(packet, list)
     }
 
-    private fun sendUnitPacket(packet: IPacket, connections: List<IConnection>): ICommunicationPromise<Unit> {
+    fun sendUnitPacket(packet: IPacket, connections: List<IConnection>): ICommunicationPromise<Unit> {
         var promise: ICommunicationPromise<Unit> = CommunicationPromise(0L, true)
         for (listeningConnection in connections) {
             promise = listeningConnection.sendUnitQuery(packet).combine(promise, true)
@@ -56,7 +73,12 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
     }
 
     fun addTournament(tournament: ServerTournament) {
-        tournaments.add(tournament)
+        creationLock.withLock { tournaments.add(tournament) }
+    }
+
+    fun deleteTournament(tournament: ServerTournament) {
+        creationLock.withLock { tournaments.remove(tournament) }
+        tournament.delete()
     }
 
     init {
@@ -69,12 +91,4 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
             private set
     }
 
-}
-
-fun ServerTournament.sendUnitPacket(packet: IPacket): ICommunicationPromise<Unit> {
-    return sendUnitPacket(packet)
-}
-
-fun ServerTournament.sendUnitPacket(packet: IPacket, connectionToIgnore: IConnection): ICommunicationPromise<Unit> {
-    return sendUnitPacket(packet, connectionToIgnore)
 }

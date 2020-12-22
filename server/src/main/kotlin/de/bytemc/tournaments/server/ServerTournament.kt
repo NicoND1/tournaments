@@ -8,7 +8,11 @@ import de.bytemc.tournaments.server.protocol.round.PacketOutStartRound
 import de.bytemc.tournaments.server.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.server.round.RoundPreparer
 import de.bytemc.tournaments.server.round.RoundStarter
+import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.api.player.ICloudPlayer
+import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
+import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
+import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 import java.util.*
 
 /**
@@ -35,6 +39,25 @@ class ServerTournament(
             }
         }
         return true
+    }
+
+    fun delete() {
+        if (state() == TournamentState.PLAYING) {
+            val serviceGroup = CloudAPI.instance.getCloudServiceGroupManager()
+                .getServiceGroupByName(settings().teamsOption.serviceGroupName) ?: return
+
+            for (allService in serviceGroup.getAllServices()) {
+                if (!allService.hasProperty("tournamentMatch")) continue
+
+                val property = allService.getProperty<TournamentMatchData>("tournamentMatch") ?: continue
+                val matchData = property.getValue()
+                if (matchData.tournamentID == id()) {
+                    allService.shutdown()
+                    matchData.firstTeam.broadcast(AllBroadcastMessage("§cDas Turnier wurde gelöscht."))
+                    matchData.secondTeam.broadcast(AllBroadcastMessage("§cDas Turnier wurde gelöscht."))
+                }
+            }
+        }
     }
 
     private fun handleStateChange(state: TournamentState) {
@@ -101,6 +124,14 @@ class ServerTournament(
 
     fun broadcast(message: BroadcastMessage) {
         teams().forEach { _ -> broadcast(message) }
+    }
+
+    fun sendUnitPacket(packet: IPacket): ICommunicationPromise<Unit> {
+        return ServerTournamentAPI.instance.sendUnitPacket(packet)
+    }
+
+    fun sendUnitPacket(packet: IPacket, connectionToIgnore: IConnection): ICommunicationPromise<Unit> {
+        return ServerTournamentAPI.instance.sendUnitPacket(packet, connectionToIgnore)
     }
 
 }

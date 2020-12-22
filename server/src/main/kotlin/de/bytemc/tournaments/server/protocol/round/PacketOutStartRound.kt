@@ -20,6 +20,12 @@ class PacketOutStartRound(tournament: ServerTournament, round: TournamentRound) 
             buffer.writeInt(encounter.id)
             buffer.writeInt(encounter.firstTeam.id)
             buffer.writeInt(encounter.secondTeam.id)
+
+            val winnerTeam = encounter.winnerTeam
+            buffer.writeBoolean(winnerTeam != null)
+            if (winnerTeam != null) {
+                buffer.writeInt(winnerTeam.id)
+            }
         }
     }
 

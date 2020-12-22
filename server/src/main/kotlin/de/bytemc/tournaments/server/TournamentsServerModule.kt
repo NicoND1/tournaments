@@ -2,7 +2,9 @@ package de.bytemc.tournaments.server
 
 import de.bytemc.tournaments.server.listener.ServicesListener
 import de.bytemc.tournaments.server.protocol.PacketInCreateTournament
+import de.bytemc.tournaments.server.protocol.PacketInDeleteTournament
 import de.bytemc.tournaments.server.protocol.PacketOutCreateTournament
+import de.bytemc.tournaments.server.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.server.protocol.round.PacketOutStartRound
 import de.bytemc.tournaments.server.protocol.round.encounter.PacketInWinEncounter
 import de.bytemc.tournaments.server.protocol.round.encounter.PacketOutWinEncounter
@@ -44,6 +46,9 @@ class TournamentsServerModule : ICloudModule {
 
         packetManager.registerPacket(PacketInWinEncounter::class.java)
         packetManager.registerPacket(PacketOutWinEncounter::class.java)
+
+        packetManager.registerPacket(PacketOutDeleteTournament::class.java)
+        packetManager.registerPacket(PacketInDeleteTournament::class.java)
     }
 
     override fun onDisable() {
