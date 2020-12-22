@@ -5,8 +5,8 @@ import de.bytemc.tournaments.api.TournamentMap
 import de.bytemc.tournaments.api.TournamentMatchData
 import de.bytemc.tournaments.server.ServerTournament
 import de.bytemc.tournaments.server.broadcast
-import de.bytemc.tournaments.server.broadcast.BroadcastMessage
-import de.bytemc.tournaments.server.broadcast.secondaryColor
+import de.bytemc.tournaments.common.broadcast.BroadcastMessage
+import de.bytemc.tournaments.common.broadcast.secondaryColor
 import de.bytemc.tournaments.server.handleError
 import eu.thesimplecloud.api.player.ICloudPlayer
 import eu.thesimplecloud.api.service.ICloudService

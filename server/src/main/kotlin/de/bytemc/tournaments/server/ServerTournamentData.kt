@@ -2,9 +2,9 @@ package de.bytemc.tournaments.server
 
 import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.TournamentTeam
-import de.bytemc.tournaments.server.broadcast.BroadcastMessage
-import de.bytemc.tournaments.server.broadcast.primaryColor
-import de.bytemc.tournaments.server.broadcast.secondaryColor
+import de.bytemc.tournaments.common.broadcast.BroadcastMessage
+import de.bytemc.tournaments.common.broadcast.primaryColor
+import de.bytemc.tournaments.common.broadcast.secondaryColor
 import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutWinEncounter
 import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.api.player.ICloudPlayer
