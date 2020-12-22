@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.server
 
+import de.bytemc.tournaments.server.command.TournamentCommand
 import de.bytemc.tournaments.server.listener.ServicesListener
 import de.bytemc.tournaments.server.protocol.*
 import de.bytemc.tournaments.server.protocol.round.PacketInStartRound
@@ -15,6 +16,7 @@ import de.bytemc.tournaments.server.protocol.team.PacketOutRemoveTeamParticipant
 import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.api.external.ICloudModule
 import eu.thesimplecloud.clientserverapi.lib.packetmanager.IPacketManager
+import eu.thesimplecloud.launcher.startup.Launcher
 
 /**
  * @author Nico_ND1
@@ -25,6 +27,7 @@ class TournamentsServerModule : ICloudModule {
         CloudAPI.instance.getEventManager().registerListener(this, ServicesListener())
 
         registerPackets(CloudAPI.instance.getThisSidesCommunicationBootstrap().getPacketManager())
+        Launcher.instance.commandManager.registerCommand(this, TournamentCommand())
     }
 
     private fun registerPackets(packetManager: IPacketManager) {

@@ -35,6 +35,8 @@ class RoundStarter(val tournament: ServerTournament, val round: TournamentRound)
 
     private fun startSync(serviceGroup: ICloudServiceGroup) {
         val configuration = serviceGroup.createStartConfiguration()
+        val map = pollMap()
+
         for (encounter in round.encounters) {
             if (encounter.firstTeam.isEmpty()) {
                 handleEmptyEncounter(encounter, encounter.firstTeam)
@@ -42,7 +44,7 @@ class RoundStarter(val tournament: ServerTournament, val round: TournamentRound)
                 handleEmptyEncounter(encounter, encounter.secondTeam)
             } else {
                 val promise = configuration.startService()
-                promise.addCompleteListener(ServiceCreatePromiseListener(tournament, encounter, pollMap()))
+                promise.addCompleteListener(ServiceCreatePromiseListener(tournament, encounter, map))
             }
         }
     }

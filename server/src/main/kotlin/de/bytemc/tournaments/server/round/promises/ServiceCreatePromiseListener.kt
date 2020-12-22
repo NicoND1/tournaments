@@ -33,7 +33,8 @@ class ServiceCreatePromiseListener(
 
             encounter.broadcast(object : BroadcastMessage {
                 override fun message(player: ICloudPlayer): String {
-                    return "§aEuer Server für die ${player.secondaryColor()}Turnier Runde §astartet jetzt..."
+                    return "§aEuer Server für die ${player.secondaryColor()}Turnier Runde §astartet jetzt.\n" +
+                            " §7In dieser Runde spielen alle auf der Map ${player.secondaryColor()}${map.name}§7."
                 }
             })
         } else {
