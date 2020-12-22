@@ -1,11 +1,11 @@
-package de.bytemc.tournaments.server.protocol
+package de.bytemc.tournaments.lobby.protocol
 
 import de.bytemc.tournaments.api.TournamentCreator
 import de.bytemc.tournaments.api.TournamentSettings
 import de.bytemc.tournaments.api.TournamentState
 import de.bytemc.tournaments.api.TournamentTeam
-import de.bytemc.tournaments.server.ServerTournament
-import de.bytemc.tournaments.server.ServerTournamentAPI
+import de.bytemc.tournaments.lobby.LobbyTournament
+import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.JsonPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -22,15 +22,13 @@ class PacketInCreateTournament : JsonPacket() {
         val creator = jsonLib.getObject("creator", TournamentCreator::class.java)
         val settings = jsonLib.getObject("settings", TournamentSettings::class.java)
 
-        if (ServerTournamentAPI.instance.findTournamentByCreator(creator!!.uuid) != null) {
-            return success(false)
-        }
-
         val teamList: List<TournamentTeam> = arrayListOf()
         val teams = jsonLib.getObject("teams", teamList::class.java)
 
-        addTournament(id!!, state!!, creator, settings!!, teams!!)
-        return success(true)
+        addTournament(id!!, state!!, creator!!, settings!!, teams!!)
+
+        // TODO: If creator created with inventory, open the manage inventory for him
+        return unit()
     }
 
     private fun addTournament(
@@ -40,9 +38,9 @@ class PacketInCreateTournament : JsonPacket() {
         settings: TournamentSettings,
         teams: List<TournamentTeam>,
     ) {
-        val tournament = ServerTournament(id, creator, settings, teams)
+        val tournament = LobbyTournament(id, creator, settings, teams)
         tournament.currentState = state
 
-        ServerTournamentAPI.instance.addTournament(tournament)
+        LobbyTournamentAPI.instance.addTournament(tournament)
     }
 }

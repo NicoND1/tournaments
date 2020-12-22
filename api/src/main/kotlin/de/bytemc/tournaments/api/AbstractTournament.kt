@@ -9,7 +9,7 @@ abstract class AbstractTournament(
     private val id: UUID,
     private val creator: TournamentCreator,
     private val settings: TournamentSettings,
-    private val teams: List<TournamentTeam>
+    private val teams: List<TournamentTeam>,
 ) : ITournament {
 
     var currentRound: TournamentRound? = null
@@ -22,5 +22,7 @@ abstract class AbstractTournament(
     override fun state() = currentState
 
     override fun currentRound() = currentRound
+
+    override fun findTeam(id: Int) = teams.firstOrNull { it.id == id }
 
 }

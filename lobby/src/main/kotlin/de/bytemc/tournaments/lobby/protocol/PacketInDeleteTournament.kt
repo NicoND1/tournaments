@@ -1,7 +1,7 @@
-package de.bytemc.tournaments.server.protocol
+package de.bytemc.tournaments.lobby.protocol
 
 import de.bytemc.tournaments.api.readUUID
-import de.bytemc.tournaments.server.ServerTournamentAPI
+import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -12,10 +12,10 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 class PacketInDeleteTournament : BytePacket() {
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         val tournamentID = readUUID()
-        val tournament = ServerTournamentAPI.instance.findTournament(tournamentID)
+        val tournament = LobbyTournamentAPI.instance.findTournament(tournamentID)
             ?: return failure(NullPointerException("Couldn't find tournament $tournamentID"))
 
-        ServerTournamentAPI.instance.deleteTournament(tournament)
+        LobbyTournamentAPI.instance.deleteTournament(tournament)
         return unit()
     }
 }

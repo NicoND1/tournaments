@@ -1,21 +1,25 @@
-package de.bytemc.tournaments.server.protocol
+package de.bytemc.tournaments.common.protocol.team
 
-import de.bytemc.tournaments.server.writeUUID
+import de.bytemc.tournaments.api.*
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
-import java.util.*
 
 /**
  * @author Nico_ND1
  */
-class PacketOutDeleteTournament(tournamentID: UUID) : BytePacket() {
+class PacketOutAddTeamParticipant(tournament: ITournament, team: TournamentTeam, participant: TournamentParticipant) :
+    BytePacket() {
 
     init {
-        writeUUID(tournamentID)
+        writeUUID(tournament.id())
+        buffer.writeInt(team.id)
+        writeUUID(participant.uuid)
+        writeString(participant.name)
     }
 
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         return unit()
     }
+
 }

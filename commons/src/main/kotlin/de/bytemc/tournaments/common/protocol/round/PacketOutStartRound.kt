@@ -1,8 +1,8 @@
-package de.bytemc.tournaments.server.protocol.round
+package de.bytemc.tournaments.common.protocol.round
 
+import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentRound
-import de.bytemc.tournaments.server.ServerTournament
-import de.bytemc.tournaments.server.writeUUID
+import de.bytemc.tournaments.api.writeUUID
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -10,7 +10,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 /**
  * @author Nico_ND1
  */
-class PacketOutStartRound(tournament: ServerTournament, round: TournamentRound) : BytePacket() {
+class PacketOutStartRound(tournament: ITournament, round: TournamentRound) : BytePacket() {
 
     init {
         writeUUID(tournament.id())

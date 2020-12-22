@@ -1,11 +1,10 @@
-package de.bytemc.tournaments.server.protocol.team
+package de.bytemc.tournaments.lobby.protocol.team
 
+import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentParticipant
 import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.api.readUUID
-import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
-import de.bytemc.tournaments.server.ServerTournament
-import de.bytemc.tournaments.server.ServerTournamentAPI
+import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -18,26 +17,26 @@ class PacketInRemoveTeamParticipant : BytePacket() {
 
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         val id = readUUID()
-        val tournament = ServerTournamentAPI.instance.findTournament(id)
+        val tournament = LobbyTournamentAPI.instance.findTournament(id)
 
         if (tournament != null) {
-            return success(removeFromTournament(tournament, connection))
+            return success(removeFromTournament(tournament))
         }
         return success(false)
     }
 
-    private fun removeFromTournament(tournament: ServerTournament, connection: IConnection): Boolean {
+    private fun removeFromTournament(tournament: ITournament): Boolean {
         val teamID = buffer.readInt()
         for (team in tournament.teams()) {
             if (team.id == teamID) {
-                return removeFromTeam(tournament, team, connection)
+                return removeFromTeam(team)
             }
         }
 
         return false
     }
 
-    private fun removeFromTeam(tournament: ServerTournament, team: TournamentTeam, connection: IConnection): Boolean {
+    private fun removeFromTeam(team: TournamentTeam): Boolean {
         val participantID = readUUID()
 
         var participant: TournamentParticipant? = null
@@ -52,19 +51,7 @@ class PacketInRemoveTeamParticipant : BytePacket() {
         } else {
             team.participantsLock.withLock { team.participants.remove(participant) }
         }
-
-        notifyExcept(tournament, team, participant, connection)
         return true
-    }
-
-    private fun notifyExcept(
-        tournament: ServerTournament,
-        team: TournamentTeam,
-        participant: TournamentParticipant,
-        connection: IConnection,
-    ) {
-        val packet = PacketOutRemoveTeamParticipant(tournament, team, participant)
-        tournament.sendUnitPacket(packet, connection)
     }
 
 }

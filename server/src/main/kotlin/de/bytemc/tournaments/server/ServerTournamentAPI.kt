@@ -2,8 +2,8 @@ package de.bytemc.tournaments.server
 
 import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.common.MultiTeamsOptionReader
-import de.bytemc.tournaments.server.protocol.PacketOutCreateTournament
-import de.bytemc.tournaments.server.protocol.round.PacketOutStartRound
+import de.bytemc.tournaments.common.protocol.PacketOutCreateTournament
+import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.CommunicationPromise
@@ -31,6 +31,8 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         val teamsOptions = MultiTeamsOptionReader().readOptions("BedWars") // TODO: Load all games
         games.add(TournamentGame("BedWars", "§c", "BedWars", teamsOptions))
     }
+
+    override fun allGames() = games
 
     fun createTournament(creator: TournamentCreator, settings: TournamentSettings): ServerTournament? {
         if (findTournamentByCreator(creator.uuid) != null) {
@@ -100,7 +102,5 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         lateinit var instance: ServerTournamentAPI
             private set
     }
-
-    override fun allGames() = games
 
 }

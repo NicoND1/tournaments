@@ -1,5 +1,7 @@
 package de.bytemc.tournaments.api
 
+import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
+import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import java.util.stream.Collectors
@@ -83,4 +85,23 @@ data class TournamentEncounter(
             secondTeam
         }
     }
+}
+
+fun BytePacket.writeUUID(uuid: UUID) {
+    buffer.writeLong(uuid.mostSignificantBits)
+    buffer.writeLong(uuid.leastSignificantBits)
+}
+
+fun BytePacket.readUUID(): UUID {
+    return UUID(buffer.readLong(), buffer.readLong())
+}
+
+fun BytePacket.writeString(string: String) {
+    buffer.writeInt(string.length)
+    buffer.writeBytes(string.toByteArray(StandardCharsets.UTF_8))
+}
+
+fun BytePacket.readString(): String {
+    val length = buffer.readInt()
+    return buffer.readBytes(length).toString(StandardCharsets.UTF_8)
 }

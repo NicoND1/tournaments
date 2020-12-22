@@ -13,6 +13,7 @@
     <module>api</module>
     <module>commons</module>
     <module>server</module>
+      <module>lobby</module>
   </modules>
 
   <properties>

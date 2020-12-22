@@ -1,4 +1,4 @@
-package de.bytemc.tournaments.server.protocol
+package de.bytemc.tournaments.common.protocol
 
 import de.bytemc.tournaments.api.ITournament
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection

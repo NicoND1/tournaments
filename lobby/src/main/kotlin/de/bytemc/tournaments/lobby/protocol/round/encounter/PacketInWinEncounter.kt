@@ -1,10 +1,9 @@
-package de.bytemc.tournaments.server.protocol.round.encounter
+package de.bytemc.tournaments.lobby.protocol.round.encounter
 
+import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.readUUID
-import de.bytemc.tournaments.server.ServerTournament
-import de.bytemc.tournaments.server.ServerTournamentAPI
-import de.bytemc.tournaments.server.setWinnerTeam
+import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -16,7 +15,7 @@ class PacketInWinEncounter : BytePacket() {
 
     override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
         val id = readUUID()
-        val tournament = ServerTournamentAPI.instance.findTournament(id)
+        val tournament = LobbyTournamentAPI.instance.findTournament(id)
 
         return if (tournament == null) {
             failure(NullPointerException("Couldn't find tournament for $id"))
@@ -25,7 +24,7 @@ class PacketInWinEncounter : BytePacket() {
         }
     }
 
-    private fun findEncounter(tournament: ServerTournament): ICommunicationPromise<Boolean> {
+    private fun findEncounter(tournament: ITournament): ICommunicationPromise<Boolean> {
         val encounterID = buffer.readInt()
         val round = tournament.currentRound()
 
@@ -40,16 +39,16 @@ class PacketInWinEncounter : BytePacket() {
         return success(false)
     }
 
-    private fun findTeam(tournament: ServerTournament, encounter: TournamentEncounter): ICommunicationPromise<Boolean> {
+    private fun findTeam(tournament: ITournament, encounter: TournamentEncounter): ICommunicationPromise<Boolean> {
         val teamID = buffer.readInt()
 
         return when {
             encounter.firstTeam.id == teamID -> {
-                encounter.setWinnerTeam(tournament, encounter.firstTeam)
+                encounter.winnerTeam = encounter.firstTeam
                 success(true)
             }
             encounter.secondTeam.id == teamID -> {
-                encounter.setWinnerTeam(tournament, encounter.secondTeam)
+                encounter.winnerTeam = encounter.secondTeam
                 success(true)
             }
             else -> {

@@ -21,4 +21,6 @@ interface ITournament {
 
     fun currentRound(): TournamentRound?
 
+    fun findTeam(id: Int): TournamentTeam?
+
 }

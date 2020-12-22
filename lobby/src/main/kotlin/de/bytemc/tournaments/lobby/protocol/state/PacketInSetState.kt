@@ -1,8 +1,8 @@
-package de.bytemc.tournaments.server.protocol.state
+package de.bytemc.tournaments.lobby.protocol.state
 
 import de.bytemc.tournaments.api.TournamentState
 import de.bytemc.tournaments.api.readUUID
-import de.bytemc.tournaments.server.ServerTournamentAPI
+import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -21,8 +21,12 @@ class PacketInSetState : BytePacket() {
     }
 
     private fun findAndUpdate(id: UUID, state: TournamentState): Boolean {
-        val tournament = ServerTournamentAPI.instance.findTournament(id)
-        return tournament?.setState(state) ?: false
+        val tournament = LobbyTournamentAPI.instance.findTournament(id)
+        if (tournament != null) {
+            tournament.currentState = state
+            return true
+        }
+        return false
     }
 
 }

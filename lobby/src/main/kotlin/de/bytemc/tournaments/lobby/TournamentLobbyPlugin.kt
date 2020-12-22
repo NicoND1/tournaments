@@ -1,36 +1,32 @@
-package de.bytemc.tournaments.server
+package de.bytemc.tournaments.lobby
 
 import de.bytemc.tournaments.common.protocol.PacketOutCreateTournament
 import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.PacketOutStartListening
-import de.bytemc.tournaments.server.command.TournamentCommand
-import de.bytemc.tournaments.server.listener.ServicesListener
-import de.bytemc.tournaments.server.protocol.*
-import de.bytemc.tournaments.server.protocol.round.PacketInStartRound
 import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
-import de.bytemc.tournaments.server.protocol.round.encounter.PacketInWinEncounter
 import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutWinEncounter
-import de.bytemc.tournaments.server.protocol.state.PacketInSetState
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
-import de.bytemc.tournaments.server.protocol.team.PacketInAddTeamParticipant
-import de.bytemc.tournaments.server.protocol.team.PacketInRemoveTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
+import de.bytemc.tournaments.lobby.protocol.PacketInCreateTournament
+import de.bytemc.tournaments.lobby.protocol.PacketInDeleteTournament
+import de.bytemc.tournaments.lobby.protocol.PacketInStartListening
+import de.bytemc.tournaments.lobby.protocol.round.PacketInStartRound
+import de.bytemc.tournaments.lobby.protocol.round.encounter.PacketInWinEncounter
+import de.bytemc.tournaments.lobby.protocol.state.PacketInSetState
+import de.bytemc.tournaments.lobby.protocol.team.PacketInAddTeamParticipant
+import de.bytemc.tournaments.lobby.protocol.team.PacketInRemoveTeamParticipant
 import eu.thesimplecloud.api.CloudAPI
-import eu.thesimplecloud.api.external.ICloudModule
 import eu.thesimplecloud.clientserverapi.lib.packetmanager.IPacketManager
-import eu.thesimplecloud.launcher.startup.Launcher
+import org.bukkit.plugin.java.JavaPlugin
 
 /**
  * @author Nico_ND1
  */
-class TournamentsServerModule : ICloudModule {
+class TournamentLobbyPlugin : JavaPlugin() {
 
     override fun onEnable() {
-        CloudAPI.instance.getEventManager().registerListener(this, ServicesListener())
-
         registerPackets(CloudAPI.instance.getThisSidesCommunicationBootstrap().getPacketManager())
-        Launcher.instance.commandManager.registerCommand(this, TournamentCommand())
     }
 
     private fun registerPackets(packetManager: IPacketManager) {
@@ -59,6 +55,4 @@ class TournamentsServerModule : ICloudModule {
         packetManager.registerPacket(PacketInStartListening::class.java)
     }
 
-    override fun onDisable() {
-    }
 }
