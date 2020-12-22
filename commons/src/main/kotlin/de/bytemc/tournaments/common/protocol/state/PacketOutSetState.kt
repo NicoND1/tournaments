@@ -1,6 +1,7 @@
 package de.bytemc.tournaments.common.protocol.state
 
 import de.bytemc.tournaments.api.ITournament
+import de.bytemc.tournaments.api.TournamentState
 import de.bytemc.tournaments.api.writeUUID
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
@@ -11,9 +12,9 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
  */
 class PacketOutSetState : BytePacket {
 
-    constructor(tournament: ITournament) {
+    constructor(tournament: ITournament, state: TournamentState) {
         writeUUID(tournament.id())
-        buffer.writeInt(tournament.state().ordinal)
+        buffer.writeInt(state.ordinal)
     }
 
     constructor()

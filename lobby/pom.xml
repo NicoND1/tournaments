@@ -33,6 +33,13 @@
       <version>1.8.8-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>eu.thesimplecloud.simplecloud</groupId>
+      <artifactId>simplecloud-plugin</artifactId>
+      <version>2.0.1-20201204.224649-29</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
 </project>

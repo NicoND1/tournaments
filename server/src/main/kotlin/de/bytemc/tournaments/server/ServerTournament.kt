@@ -1,11 +1,11 @@
 package de.bytemc.tournaments.server
 
 import de.bytemc.tournaments.api.*
+import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
+import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.server.broadcast.AllBroadcastMessage
 import de.bytemc.tournaments.server.broadcast.BroadcastMessage
 import de.bytemc.tournaments.server.broadcast.secondaryColor
-import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
-import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.server.round.RoundPreparer
 import de.bytemc.tournaments.server.round.RoundStarter
 import eu.thesimplecloud.api.CloudAPI
@@ -25,13 +25,13 @@ class ServerTournament(
     teams: List<TournamentTeam>,
 ) : AbstractTournament(id, creator, settings, teams) {
 
-    override fun setState(newState: TournamentState): Boolean {
+    fun setState(newState: TournamentState): Boolean {
         if (currentState == newState) {
             return false
         }
 
         currentState = newState
-        sendUnitPacket(PacketOutSetState(this)).addCompleteListener {
+        sendUnitPacket(PacketOutSetState(this, newState)).addCompleteListener {
             if (it.isSuccess) {
                 handleStateChange(newState)
             } else {

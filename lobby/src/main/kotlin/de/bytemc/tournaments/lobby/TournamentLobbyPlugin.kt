@@ -27,6 +27,9 @@ class TournamentLobbyPlugin : JavaPlugin() {
 
     override fun onEnable() {
         registerPackets(CloudAPI.instance.getThisSidesCommunicationBootstrap().getPacketManager())
+
+        val api = LobbyTournamentAPI()
+        api.sendPacket(PacketOutStartListening())
     }
 
     private fun registerPackets(packetManager: IPacketManager) {

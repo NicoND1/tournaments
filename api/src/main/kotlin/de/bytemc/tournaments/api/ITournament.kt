@@ -17,8 +17,6 @@ interface ITournament {
 
     fun state(): TournamentState
 
-    fun setState(newState: TournamentState): Boolean
-
     fun currentRound(): TournamentRound?
 
     fun findTeam(id: Int): TournamentTeam?
