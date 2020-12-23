@@ -5,8 +5,10 @@ import de.bytemc.core.entitiesutils.inventories.ClickResult
 import de.bytemc.core.entitiesutils.inventories.ClickableItem
 import de.bytemc.core.entitiesutils.inventories.NoneClickableItem
 import de.bytemc.core.entitiesutils.items.ItemCreator
+import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentState
+import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
 import de.bytemc.tournaments.lobby.*
@@ -30,6 +32,8 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
     }
 
     private fun setItems() {
+        design(player, 22, 0, 2)
+
         setTeamsItem()
         setParticipationItem()
 
@@ -37,6 +41,11 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
             setDeletionItem()
             setActionItem()
         }
+    }
+
+    override fun openSilent(player: Player?) {
+        setItems()
+        super.openSilent(player)
     }
 
     companion object {
@@ -59,6 +68,7 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
             ClickableItem(ItemCreator(Material.BARRIER).setName(player.format("§cTurnier löschen")).toItemStack()) {
             override fun onClick(p0: Player, p1: ItemStack): ClickResult {
                 LobbyTournamentAPI.instance.deleteTournament(tournament)
+                tournament.sendPacket(PacketOutDeleteTournament(tournament.id()))
                 clear()
                 p0.updateInventory()
                 return ClickResult.CANCEL
@@ -93,7 +103,7 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
                         player.playSound(player.location, Sound.VILLAGER_NO, 1f, 1f)
                         return ClickResult.CANCEL
                     }
-                    participationCooldown = PARTICIPATION_COOLDOWN
+                    participationCooldown = System.currentTimeMillis() + PARTICIPATION_COOLDOWN
 
                     val team = tournament.findTeam(p0.uniqueId)
                     val packet = if (team == null) {
@@ -108,8 +118,8 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
                         PacketOutRemoveTeamParticipant(tournament, team, player.toParticipant())
                     }
 
-                    LobbyTournamentAPI.instance.sendPacket(packet, Boolean::class.java).addResultListener {
-                        if (it) {
+                    LobbyTournamentAPI.instance.sendPacket(packet, BooleanResult::class.java).addResultListener {
+                        if (it.result) {
                             setParticipationItem()
                             player.updateInventory()
                         } else {

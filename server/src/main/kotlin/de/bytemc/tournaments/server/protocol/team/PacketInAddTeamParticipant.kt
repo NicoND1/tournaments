@@ -19,34 +19,42 @@ class PacketInAddTeamParticipant : BytePacket() {
         val tournament = ServerTournamentAPI.instance.findTournament(id)
 
         if (tournament != null) {
-            return success(BooleanResult(addToTournament(tournament, connection)))
+            return success(BooleanResult(addToTournament(tournament)))
         }
         return success(BooleanResult.FALSE)
     }
 
-    private fun addToTournament(tournament: ServerTournament, connection: IConnection): Boolean {
+    private fun addToTournament(tournament: ServerTournament): Boolean {
         val teamID = buffer.readInt()
         for (team in tournament.teams()) {
             if (team.id == teamID) {
-                return addToTeam(tournament, team, connection)
+                return addToTeam(tournament, team)
             }
         }
 
+        buffer.release()
         return false
     }
 
-    private fun addToTeam(tournament: ServerTournament, team: TournamentTeam, connection: IConnection): Boolean {
+    private fun addToTeam(tournament: ServerTournament, team: TournamentTeam): Boolean {
         val participant = readParticipant()
         if (team.participants.contains(participant)) {
+            buffer.release()
             return false
         }
 
         if (team.participants.size == tournament.settings().teamsOption.playersPerTeam) {
+            buffer.release()
+            return false
+        }
+
+        if (tournament.findTeam(participant.uuid) != null) {
+            buffer.release()
             return false
         }
 
         team.participantsLock.withLock { team.participants.add(participant) }
-        notifyExcept(tournament, team, participant, connection)
+        tournament.sendUnitPacket(PacketOutAddTeamParticipant(tournament, team, participant)).await()
         return true
     }
 
@@ -59,16 +67,6 @@ class PacketInAddTeamParticipant : BytePacket() {
             return TournamentParticipant(uuid, name, texture)
         }
         return TournamentParticipant(uuid, name)
-    }
-
-    private fun notifyExcept(
-        tournament: ServerTournament,
-        team: TournamentTeam,
-        participant: TournamentParticipant,
-        connection: IConnection,
-    ) {
-        val packet = PacketOutAddTeamParticipant(tournament, team, participant)
-        tournament.sendUnitPacket(packet, connection)
     }
 
 }

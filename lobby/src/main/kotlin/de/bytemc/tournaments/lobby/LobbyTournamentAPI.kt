@@ -43,7 +43,7 @@ class LobbyTournamentAPI : AbstractTournamentAPI<LobbyTournament>() {
 
         val id = UUID.randomUUID()
         val teams: ArrayList<TournamentTeam> = ArrayList(settings.teamsAmount)
-        for (i in 0..settings.teamsAmount) {
+        for (i in 1..settings.teamsAmount) {
             teams.add(TournamentTeam(i, arrayListOf()))
         }
 

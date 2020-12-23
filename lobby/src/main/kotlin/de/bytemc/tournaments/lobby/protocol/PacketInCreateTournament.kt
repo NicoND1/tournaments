@@ -23,7 +23,7 @@ class PacketInCreateTournament : BytePacket() {
         val settings = findSettings()
 
         val teams: ArrayList<TournamentTeam> = arrayListOf()
-        for (i in 0..settings.teamsAmount) {
+        for (i in 1..settings.teamsAmount) {
             teams.add(TournamentTeam(i, arrayListOf()))
         }
 

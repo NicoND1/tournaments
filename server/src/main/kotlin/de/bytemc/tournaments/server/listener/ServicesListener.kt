@@ -23,6 +23,10 @@ class ServicesListener : IListener {
         if (client != null) {
             ServerTournamentAPI.instance.stopListening(client)
         }
+
+        if (event.cloudService.hasProperty("tournamentMatch")) {
+            // TODO: If this match hasn't sent a winner just poll a random one
+        }
     }
 
 }

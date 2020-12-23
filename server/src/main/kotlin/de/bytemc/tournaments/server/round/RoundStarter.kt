@@ -4,11 +4,12 @@ import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.TournamentMap
 import de.bytemc.tournaments.api.TournamentRound
 import de.bytemc.tournaments.api.TournamentTeam
-import de.bytemc.tournaments.server.ServerTournament
-import de.bytemc.tournaments.server.broadcast
 import de.bytemc.tournaments.common.broadcast.BroadcastMessage
 import de.bytemc.tournaments.common.broadcast.secondaryColor
+import de.bytemc.tournaments.server.ServerTournament
+import de.bytemc.tournaments.server.broadcast
 import de.bytemc.tournaments.server.round.promises.ServiceCreatePromiseListener
+import de.bytemc.tournaments.server.setWinnerTeam
 import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.api.player.ICloudPlayer
 import eu.thesimplecloud.api.servicegroup.ICloudServiceGroup
@@ -39,9 +40,9 @@ class RoundStarter(val tournament: ServerTournament, val round: TournamentRound)
 
         for (encounter in round.encounters) {
             if (encounter.firstTeam.isEmpty()) {
-                handleEmptyEncounter(encounter, encounter.firstTeam)
+                handleEmptyEncounter(encounter, encounter.firstTeam, encounter.secondTeam)
             } else if (encounter.secondTeam.isEmpty()) {
-                handleEmptyEncounter(encounter, encounter.secondTeam)
+                handleEmptyEncounter(encounter, encounter.secondTeam, encounter.firstTeam)
             } else {
                 val promise = configuration.startService()
                 promise.addCompleteListener(ServiceCreatePromiseListener(tournament, encounter, map))
@@ -56,9 +57,12 @@ class RoundStarter(val tournament: ServerTournament, val round: TournamentRound)
         return maps[random.nextInt(maps.size)]
     }
 
-    private fun handleEmptyEncounter(encounter: TournamentEncounter, emptyTeam: TournamentTeam) {
-        val otherTeam = encounter.otherTeam(emptyTeam)
-
+    private fun handleEmptyEncounter(
+        encounter: TournamentEncounter,
+        emptyTeam: TournamentTeam,
+        otherTeam: TournamentTeam,
+    ) {
+        encounter.setWinnerTeam(tournament, otherTeam)
         otherTeam.broadcast(object : BroadcastMessage {
             override fun message(player: ICloudPlayer): String {
                 return "§aIhr habt diese ${player.secondaryColor()}Turnier Runde §agewonnen, weil das andere Team nicht spielen kann."

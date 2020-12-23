@@ -3,6 +3,7 @@ package de.bytemc.tournaments.lobby.inventory
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import de.bytemc.core.entitiesutils.items.ItemCreator
+import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentParticipant
 import de.bytemc.tournaments.api.TournamentTeam
@@ -43,11 +44,11 @@ class TeamsInventory(
             player.playSound(player.location, Sound.VILLAGER_NO, 1f, 1f)
             return
         }
-        participationCooldown = ManageInventory.PARTICIPATION_COOLDOWN
+        participationCooldown = System.currentTimeMillis() + ManageInventory.PARTICIPATION_COOLDOWN
 
         val packet = PacketOutAddTeamParticipant(tournament, p1, player.toParticipant())
-        LobbyTournamentAPI.instance.sendPacket(packet, Boolean::class.java).addResultListener {
-            if (it) {
+        LobbyTournamentAPI.instance.sendPacket(packet, BooleanResult::class.java).addResultListener {
+            if (it.result) {
                 drawPage()
                 player.updateInventory()
             } else {
@@ -67,7 +68,7 @@ class TeamsInventory(
             getNumberItem(p0.participants.size)
         }
 
-        item.setName(player.format("Team ${player.primaryColor()}#${p0.id + 1}"))
+        item.setName(player.format("Team ${player.primaryColor()}#${p0.id}"))
 
         val lore = "§7Spieler: ${p0.participants.stream().map { par -> par.name }.collect(Collectors.joining(", "))}"
         item.setLore(*ChatPaginator.wordWrap(lore, 40))

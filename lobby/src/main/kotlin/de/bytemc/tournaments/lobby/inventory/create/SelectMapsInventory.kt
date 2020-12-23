@@ -37,6 +37,11 @@ class SelectMapsInventory(
             .setName(player.format("§lTurnier erstellen"))
             .toItemStack()) {
             override fun onClick(player: Player, itemStack: ItemStack): ClickResult {
+                if (context.maps.isEmpty()) {
+                    player.sendMessage("Mindestens eine Map du Idiot")
+                    return ClickResult.CANCEL
+                }
+
                 createTournament()
                 player.closeInventory()
                 return ClickResult.CANCEL

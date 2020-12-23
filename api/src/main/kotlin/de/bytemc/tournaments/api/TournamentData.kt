@@ -24,7 +24,20 @@ data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentPar
     }
 }
 
-data class TournamentParticipant(val uuid: UUID, val name: String, val texture: PlayerTexture? = null)
+data class TournamentParticipant(val uuid: UUID, val name: String, val texture: PlayerTexture? = null) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as TournamentParticipant
+        if (uuid != other.uuid) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return uuid.hashCode()
+    }
+}
+
 data class PlayerTexture(val value: String, val signature: String)
 
 data class TournamentSettings(
@@ -78,15 +91,7 @@ data class TournamentRound(val count: Int, val encounters: Array<TournamentEncou
 
 data class TournamentEncounter(
     val id: Int, val firstTeam: TournamentTeam, val secondTeam: TournamentTeam, var winnerTeam: TournamentTeam? = null,
-) {
-    fun otherTeam(team: TournamentTeam): TournamentTeam {
-        return if (team.id == firstTeam.id) {
-            firstTeam
-        } else {
-            secondTeam
-        }
-    }
-}
+)
 
 fun BytePacket.writeUUID(uuid: UUID) {
     buffer.writeLong(uuid.mostSignificantBits)

@@ -22,16 +22,16 @@ class PacketInRemoveTeamParticipant : BytePacket() {
         val tournament = ServerTournamentAPI.instance.findTournament(id)
 
         if (tournament != null) {
-            return success(removeFromTournament(tournament, connection))
+            return success(removeFromTournament(tournament))
         }
         return success(BooleanResult.FALSE)
     }
 
-    private fun removeFromTournament(tournament: ServerTournament, connection: IConnection): BooleanResult {
+    private fun removeFromTournament(tournament: ServerTournament): BooleanResult {
         val teamID = buffer.readInt()
         for (team in tournament.teams()) {
             if (team.id == teamID) {
-                return removeFromTeam(tournament, team, connection)
+                return removeFromTeam(tournament, team)
             }
         }
 
@@ -41,7 +41,6 @@ class PacketInRemoveTeamParticipant : BytePacket() {
     private fun removeFromTeam(
         tournament: ServerTournament,
         team: TournamentTeam,
-        connection: IConnection,
     ): BooleanResult {
         val participantID = readUUID()
 
@@ -58,18 +57,8 @@ class PacketInRemoveTeamParticipant : BytePacket() {
             team.participantsLock.withLock { team.participants.remove(participant) }
         }
 
-        notifyExcept(tournament, team, participant, connection)
+        tournament.sendUnitPacket(PacketOutRemoveTeamParticipant(tournament, team, participant)).await()
         return BooleanResult.TRUE
-    }
-
-    private fun notifyExcept(
-        tournament: ServerTournament,
-        team: TournamentTeam,
-        participant: TournamentParticipant,
-        connection: IConnection,
-    ) {
-        val packet = PacketOutRemoveTeamParticipant(tournament, team, participant)
-        tournament.sendUnitPacket(packet, connection)
     }
 
 }

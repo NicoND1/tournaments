@@ -18,12 +18,13 @@ class PacketInCreateTournament : BytePacket() {
         val id = readUUID()
         val creator = TournamentCreator(readUUID(), readString())
         if (ServerTournamentAPI.instance.findTournamentByCreator(creator.uuid) != null) {
+            buffer.release()
             return success(BooleanResult.FALSE)
         }
         val settings = findSettings()
 
         val teams: ArrayList<TournamentTeam> = arrayListOf()
-        for (i in 0..settings.teamsAmount) {
+        for (i in 1..settings.teamsAmount) {
             teams.add(TournamentTeam(i, arrayListOf()))
         }
 

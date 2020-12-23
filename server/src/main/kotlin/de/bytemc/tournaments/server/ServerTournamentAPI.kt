@@ -3,6 +3,7 @@ package de.bytemc.tournaments.server
 import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.common.MultiTeamsOptionReader
 import de.bytemc.tournaments.common.protocol.PacketOutCreateTournament
+import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
@@ -41,7 +42,7 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
 
         val id = UUID.randomUUID()
         val teams: ArrayList<TournamentTeam> = ArrayList(settings.teamsAmount)
-        for (i in 0..settings.teamsAmount) {
+        for (i in 1..settings.teamsAmount) {
             teams.add(TournamentTeam(i, arrayListOf()))
         }
 
@@ -79,7 +80,9 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
     fun sendUnitPacket(packet: IPacket, connections: List<IConnection>): ICommunicationPromise<Unit> {
         var promise: ICommunicationPromise<Unit> = CommunicationPromise(0L, true)
         for (listeningConnection in connections) {
-            promise = listeningConnection.sendUnitQuery(packet).combine(promise, true)
+            if (listeningConnection.isOpen()) {
+                promise = listeningConnection.sendUnitQuery(packet).combine(promise, true)
+            }
         }
         return promise
     }
@@ -91,6 +94,7 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
     fun deleteTournament(tournament: ServerTournament) {
         creationLock.withLock { tournaments.remove(tournament) }
         tournament.delete()
+        sendUnitPacket(PacketOutDeleteTournament(tournament.id()))
     }
 
     init {

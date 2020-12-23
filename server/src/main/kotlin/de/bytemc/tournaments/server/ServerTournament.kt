@@ -1,11 +1,11 @@
 package de.bytemc.tournaments.server
 
 import de.bytemc.tournaments.api.*
-import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
-import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.common.broadcast.AllBroadcastMessage
 import de.bytemc.tournaments.common.broadcast.BroadcastMessage
 import de.bytemc.tournaments.common.broadcast.secondaryColor
+import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
+import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.server.round.RoundPreparer
 import de.bytemc.tournaments.server.round.RoundStarter
 import eu.thesimplecloud.api.CloudAPI
@@ -123,7 +123,7 @@ class ServerTournament(
     }
 
     fun broadcast(message: BroadcastMessage) {
-        teams().forEach { _ -> broadcast(message) }
+        teams().forEach { team -> team.broadcast(message) }
     }
 
     fun sendUnitPacket(packet: IPacket): ICommunicationPromise<Unit> {
