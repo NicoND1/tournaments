@@ -30,7 +30,7 @@ fun TournamentTeam.broadcast(message: BroadcastMessage) {
 fun TournamentEncounter.setWinnerTeam(tournament: ServerTournament, winnerTeam: TournamentTeam) {
     this.winnerTeam = winnerTeam
 
-    tournament.sendUnitPacket(PacketOutWinEncounter(tournament, this, winnerTeam))
+    tournament.sendUnitPacket(PacketOutWinEncounter(tournament.id(), this.id, winnerTeam))
     tournament.testRoundOver()
 }
 

@@ -14,6 +14,7 @@
     <module>commons</module>
     <module>server</module>
       <module>lobby</module>
+      <module>game</module>
   </modules>
 
   <properties>
