@@ -17,7 +17,11 @@ class TournamentGamePlugin : JavaPlugin() {
 
     override fun onEnable() {
         val thisService = CloudPlugin.instance.thisService()
-        val property: IProperty<TournamentMatchData> = thisService.getProperty("tournamentMatch") ?: return
+        val property: IProperty<TournamentMatchData>? = thisService.getProperty("tournamentMatch")
+        if (property == null) {
+            server.pluginManager.disablePlugin(this)
+            return
+        }
 
         matchData = property.getValue()
     }

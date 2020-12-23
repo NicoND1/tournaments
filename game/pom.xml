@@ -11,6 +11,7 @@
 
   <groupId>de.bytemc.tournaments</groupId>
   <artifactId>game</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
 
   <repositories>
     <repository>
