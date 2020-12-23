@@ -77,6 +77,10 @@ enum class TournamentState {
 }
 
 data class TournamentRound(val count: Int, val encounters: Array<TournamentEncounter>) {
+    fun findEncounter(id: Int): TournamentEncounter? {
+        return encounters.firstOrNull { encounter -> encounter.id == id }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
