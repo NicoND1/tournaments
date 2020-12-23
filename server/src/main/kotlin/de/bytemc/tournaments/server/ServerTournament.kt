@@ -5,6 +5,7 @@ import de.bytemc.tournaments.common.broadcast.AllBroadcastMessage
 import de.bytemc.tournaments.common.broadcast.BroadcastMessage
 import de.bytemc.tournaments.common.broadcast.secondaryColor
 import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
+import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutEncounterMatches
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.server.round.RoundPreparer
 import de.bytemc.tournaments.server.round.RoundStarter
@@ -73,6 +74,7 @@ class ServerTournament(
         sendUnitPacket(PacketOutStartRound(this, round)).addCompleteListener {
             val starter = RoundStarter(this, round)
             starter.start()
+            sendUnitPacket(PacketOutEncounterMatches(this))
         }.addFailureListener {
             it.printStackTrace()
 

@@ -4,6 +4,7 @@ import de.bytemc.tournaments.common.protocol.PacketOutCreateTournament
 import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.PacketOutStartListening
 import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
+import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutEncounterMatches
 import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutWinEncounter
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
@@ -14,6 +15,7 @@ import de.bytemc.tournaments.server.protocol.PacketInCreateTournament
 import de.bytemc.tournaments.server.protocol.PacketInDeleteTournament
 import de.bytemc.tournaments.server.protocol.PacketInStartListening
 import de.bytemc.tournaments.server.protocol.round.PacketInStartRound
+import de.bytemc.tournaments.server.protocol.round.encounter.PacketInEncounterMatches
 import de.bytemc.tournaments.server.protocol.round.encounter.PacketInWinEncounter
 import de.bytemc.tournaments.server.protocol.state.PacketInSetState
 import de.bytemc.tournaments.server.protocol.team.PacketInAddTeamParticipant
@@ -61,6 +63,9 @@ class TournamentsServerModule : ICloudModule {
 
         packetManager.registerPacket(PacketOutStartListening::class.java)
         packetManager.registerPacket(PacketInStartListening::class.java)
+
+        packetManager.registerPacket(PacketOutEncounterMatches::class.java)
+        packetManager.registerPacket(PacketInEncounterMatches::class.java)
     }
 
     override fun onDisable() {

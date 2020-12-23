@@ -4,6 +4,7 @@ import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
+import de.bytemc.tournaments.lobby.inventory.pairing.TournamentPairings
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 import org.bukkit.entity.Player
@@ -18,6 +19,8 @@ class LobbyTournament(
     settings: TournamentSettings,
     teams: List<TournamentTeam>,
 ) : AbstractTournament(id, creator, settings, teams) {
+
+    var pairings: TournamentPairings? = null
 
     fun setState(newState: TournamentState): ICommunicationPromise<BooleanResult> {
         return sendPacket(PacketOutSetState(this, newState), BooleanResult::class.java)

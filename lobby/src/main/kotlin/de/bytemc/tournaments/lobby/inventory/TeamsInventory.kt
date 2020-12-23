@@ -8,6 +8,7 @@ import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentParticipant
 import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
+import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
 import de.bytemc.tournaments.lobby.*
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -46,7 +47,13 @@ class TeamsInventory(
         }
         participationCooldown = System.currentTimeMillis() + ManageInventory.PARTICIPATION_COOLDOWN
 
-        val packet = PacketOutAddTeamParticipant(tournament, p1, player.toParticipant())
+        val team = tournament.findTeam(player.uniqueId)
+        val packet = if (team != null && team.id == p1.id) {
+            PacketOutAddTeamParticipant(tournament, p1, player.toParticipant())
+        } else {
+            PacketOutRemoveTeamParticipant(tournament, p1, player.toParticipant())
+        }
+
         LobbyTournamentAPI.instance.sendPacket(packet, BooleanResult::class.java).addResultListener {
             if (it.result) {
                 drawPage()

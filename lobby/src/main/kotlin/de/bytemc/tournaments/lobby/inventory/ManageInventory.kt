@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.lobby.inventory
 
+import de.bytemc.core.ByteAPI
 import de.bytemc.core.entitiesutils.inventories.ClickInventory
 import de.bytemc.core.entitiesutils.inventories.ClickResult
 import de.bytemc.core.entitiesutils.inventories.ClickableItem
@@ -12,6 +13,7 @@ import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
 import de.bytemc.tournaments.lobby.*
+import de.bytemc.tournaments.lobby.inventory.pairing.PairingInventory
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -36,6 +38,7 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
 
         setTeamsItem()
         setParticipationItem()
+        setPairingItem()
 
         if (tournament.creator().uuid == player.uniqueId) {
             setDeletionItem()
@@ -90,6 +93,21 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
             val item = PLAYING_HEAD.setName(player.format("§cTurnier ist bereits gestartet")).toItemStack()
             setItem(15, NoneClickableItem(item))
         }
+    }
+
+    private fun setPairingItem() {
+        setItem(13, object :
+            ClickableItem(ItemCreator(Material.GOLD_HELMET).setName(player.format("Paarungen")).toItemStack()) {
+            override fun onClick(player: Player, itemStack: ItemStack): ClickResult {
+                if (tournament.state() == TournamentState.COLLECTING) {
+                    player.sendMessage("Ja ne")
+                } else {
+                    PairingInventory(tournament,
+                        ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]!!).open(player)
+                }
+                return ClickResult.CANCEL
+            }
+        })
     }
 
     private fun setParticipationItem() {

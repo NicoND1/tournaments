@@ -2,6 +2,7 @@ package de.bytemc.tournaments.lobby.protocol.round
 
 import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
+import de.bytemc.tournaments.lobby.inventory.pairing.TournamentPairings
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -19,6 +20,7 @@ class PacketInStartRound : BytePacket() {
         val encounters = readEncounters(tournament)
 
         tournament.currentRound = TournamentRound(roundCount, encounters)
+        tournament.pairings = TournamentPairings(tournament)
         return unit()
     }
 
@@ -26,13 +28,16 @@ class PacketInStartRound : BytePacket() {
         val size = buffer.readInt()
         val result: Array<TournamentEncounter?> = arrayOfNulls(size)
 
-        for (i in 0..size) {
+        for (i in 0 until size) {
             val id = buffer.readInt()
-            val firstTeam = tournament.findTeam(buffer.readInt())
-            val secondTeam = tournament.findTeam(buffer.readInt())
+            val firstTeamID = buffer.readInt()
+            val secondTeamID = buffer.readInt()
+            val firstTeam = tournament.findTeam(firstTeamID)
+            val secondTeam = tournament.findTeam(secondTeamID)
             var winnerTeam: TournamentTeam? = null
 
             if (buffer.readBoolean()) winnerTeam = tournament.findTeam(buffer.readInt())
+            println("$i $id $firstTeamID $firstTeam $secondTeamID $secondTeam")
             result[i] = TournamentEncounter(id, firstTeam!!, secondTeam!!, winnerTeam)
         }
 

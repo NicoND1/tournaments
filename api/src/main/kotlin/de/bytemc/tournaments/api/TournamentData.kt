@@ -96,7 +96,11 @@ data class TournamentRound(val count: Int, val encounters: Array<TournamentEncou
 }
 
 data class TournamentEncounter(
-    val id: Int, val firstTeam: TournamentTeam, val secondTeam: TournamentTeam, var winnerTeam: TournamentTeam? = null,
+    val id: Int,
+    val firstTeam: TournamentTeam,
+    val secondTeam: TournamentTeam,
+    var winnerTeam: TournamentTeam? = null,
+    var serviceID: UUID? = null, // TODO: Send
 )
 
 fun BytePacket.writeUUID(uuid: UUID) {
