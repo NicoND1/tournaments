@@ -1,11 +1,14 @@
 package de.bytemc.tournaments.lobby.protocol.team
 
+import de.bytemc.core.entitiesutils.inventories.ClickInventory
 import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.lobby.LobbyTournament
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
+import de.bytemc.tournaments.lobby.inventory.TeamsInventory
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
+import org.bukkit.Bukkit
 import kotlin.concurrent.withLock
 
 /**
@@ -41,8 +44,23 @@ class PacketInAddTeamParticipant : BytePacket() {
         }
 
         team.participantsLock.withLock { team.participants.add(participant) }
-        // TODO: Update inventories
+        updateInventories(team)
+
         return BooleanResult.TRUE
+    }
+
+    private fun updateInventories(team: TournamentTeam) {
+        for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+            ClickInventory.getClickInventory(onlinePlayer.uniqueId).ifPresent {
+                if (it is TeamsInventory) {
+                    for (value in it.values) {
+                        if (value.value.id == team.id) {
+                            it.updateItemAt(value.key, team)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun readParticipant(): TournamentParticipant {

@@ -24,6 +24,8 @@ class TournamentGamePlugin : JavaPlugin() {
         }
 
         matchData = property.getValue()
+        println(matchData!!.firstTeam)
+        println(matchData!!.secondTeam)
     }
 
     fun isTournamentMatch(): Boolean {
@@ -38,18 +40,18 @@ class TournamentGamePlugin : JavaPlugin() {
         for (winner in winners) {
             if (matchData!!.firstTeam.participants.any { par -> par.uuid == winner.uniqueId }) {
                 finish(matchData!!.firstTeam)
-                break
+                return
             } else if (matchData!!.secondTeam.participants.any { par -> par.uuid == winner.uniqueId }) {
                 finish(matchData!!.secondTeam)
-                break
+                return
             }
         }
 
-        throw IllegalStateException("Couldn't find team for any winner of $winners")
+        throw IllegalStateException("Couldn't find team for any winner of ${winners.contentToString()}")
     }
 
     fun finish(team: TournamentTeam) {
-        val packet = PacketOutWinEncounter(matchData!!.tournamentID, matchData!!.encounterID, team)
+        val packet = PacketOutWinEncounter(matchData!!.tournamentID, matchData!!.roundID, matchData!!.encounterID, team)
         CloudPlugin.instance.communicationClient.getConnection().sendUnitQuery(packet)
     }
 

@@ -21,6 +21,7 @@ class PacketInAddTeamParticipant : BytePacket() {
         if (tournament != null) {
             return success(BooleanResult(addToTournament(tournament)))
         }
+        buffer.release()
         return success(BooleanResult.FALSE)
     }
 

@@ -40,9 +40,9 @@ class RoundStarter(val tournament: ServerTournament, val round: TournamentRound)
 
         for (encounter in round.encounters) {
             if (encounter.firstTeam.isEmpty()) {
-                handleEmptyEncounter(encounter, encounter.firstTeam, encounter.secondTeam)
+                handleEmptyEncounter(encounter, encounter.secondTeam)
             } else if (encounter.secondTeam.isEmpty()) {
-                handleEmptyEncounter(encounter, encounter.secondTeam, encounter.firstTeam)
+                handleEmptyEncounter(encounter, encounter.firstTeam)
             } else {
                 val promise = configuration.startService()
                 promise.addCompleteListener(ServiceCreatePromiseListener(tournament, encounter, map))
@@ -57,11 +57,7 @@ class RoundStarter(val tournament: ServerTournament, val round: TournamentRound)
         return maps[random.nextInt(maps.size)]
     }
 
-    private fun handleEmptyEncounter(
-        encounter: TournamentEncounter,
-        emptyTeam: TournamentTeam,
-        otherTeam: TournamentTeam,
-    ) {
+    private fun handleEmptyEncounter(encounter: TournamentEncounter, otherTeam: TournamentTeam) {
         encounter.setWinnerTeam(tournament, otherTeam)
         otherTeam.broadcast(object : BroadcastMessage {
             override fun message(player: ICloudPlayer): String {

@@ -50,7 +50,7 @@
     <dependency>
       <groupId>de.bytemc</groupId>
       <artifactId>core</artifactId>
-      <version>1.0.1-20201221.122830-1</version>
+      <version>1.0.2-20201223.153506-3</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

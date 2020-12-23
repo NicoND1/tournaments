@@ -10,11 +10,12 @@ import java.util.*
 /**
  * @author Nico_ND1
  */
-class PacketOutWinEncounter(tournamentID: UUID, encounterID: Int, winnerTeam: TournamentTeam) :
+class PacketOutWinEncounter(tournamentID: UUID, round: Int, encounterID: Int, winnerTeam: TournamentTeam) :
     BytePacket() {
 
     init {
         writeUUID(tournamentID)
+        buffer.writeInt(round)
         buffer.writeInt(encounterID)
         buffer.writeInt(winnerTeam.id)
     }

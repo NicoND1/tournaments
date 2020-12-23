@@ -38,6 +38,7 @@ class ServicesListener : IListener {
         val matchData = property.getValue()
         val tournament = ServerTournamentAPI.instance.findTournament(matchData.tournamentID) ?: return
         val round = tournament.currentRound() ?: return
+        if (round.count != matchData.roundID) return
         val encounter = round.findEncounter(matchData.encounterID) ?: return
         if (encounter.winnerTeam != null) return
 

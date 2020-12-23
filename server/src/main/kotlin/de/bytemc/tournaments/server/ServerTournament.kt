@@ -15,6 +15,9 @@ import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Nico_ND1
@@ -87,21 +90,23 @@ class ServerTournament(
         val currentRound = currentRound() ?: return
         for (encounter in currentRound.encounters) {
             if (encounter.winnerTeam == null) {
-                return
+                return // TODO: Players who havent played yet should be prio
             }
         }
 
         val maxRounds = settings().maxRounds()
-        if (maxRounds < currentRound.count + 1) {
+        println("$maxRounds ${currentRound.count}")
+        if (currentRound.count == maxRounds) {
             notifyWinner(currentRound)
+            println("Notify winner")
         } else {
             broadcast(object : BroadcastMessage {
                 override fun message(player: ICloudPlayer): String {
-                    return "§aDie ${player.secondaryColor()}Turnier Runde §aist vorbei, die nächste beginnt in Kürze."
+                    return "§aDie ${player.secondaryColor()}Turnier Runde §aist vorbei, die nächste (${currentRound.count + 1}) beginnt in Kürze."
                 }
             })
 
-            startRound(currentRound.count + 1)
+            SCHEDULED_EXECUTOR.schedule({ startRound(currentRound.count + 1) }, 10, TimeUnit.SECONDS)
         }
     }
 
@@ -134,6 +139,10 @@ class ServerTournament(
 
     fun sendUnitPacket(packet: IPacket, connectionToIgnore: IConnection): ICommunicationPromise<Unit> {
         return ServerTournamentAPI.instance.sendUnitPacket(packet, connectionToIgnore)
+    }
+
+    companion object {
+        val SCHEDULED_EXECUTOR: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
     }
 
 }

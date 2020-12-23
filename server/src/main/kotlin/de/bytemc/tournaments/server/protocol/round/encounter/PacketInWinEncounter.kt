@@ -18,12 +18,18 @@ class PacketInWinEncounter : BytePacket() {
     override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val tournament = ServerTournamentAPI.instance.findTournament(id)
-
-        return if (tournament == null) {
-            failure(NullPointerException("Couldn't find tournament for $id"))
-        } else {
-            findEncounter(tournament)
+        if (tournament == null) {
+            buffer.release()
+            return failure(NullPointerException("Couldn't find tournament for $id"))
         }
+
+        val round = buffer.readInt()
+        if (tournament.currentRound()?.count != round) {
+            buffer.release()
+            return success(BooleanResult.FALSE)
+        }
+
+        return findEncounter(tournament)
     }
 
     private fun findEncounter(tournament: ServerTournament): ICommunicationPromise<BooleanResult> {

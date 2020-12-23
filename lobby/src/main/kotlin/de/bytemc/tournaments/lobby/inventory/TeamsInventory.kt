@@ -49,9 +49,9 @@ class TeamsInventory(
 
         val team = tournament.findTeam(player.uniqueId)
         val packet = if (team != null && team.id == p1.id) {
-            PacketOutAddTeamParticipant(tournament, p1, player.toParticipant())
-        } else {
             PacketOutRemoveTeamParticipant(tournament, p1, player.toParticipant())
+        } else {
+            PacketOutAddTeamParticipant(tournament, p1, player.toParticipant())
         }
 
         LobbyTournamentAPI.instance.sendPacket(packet, BooleanResult::class.java).addResultListener {

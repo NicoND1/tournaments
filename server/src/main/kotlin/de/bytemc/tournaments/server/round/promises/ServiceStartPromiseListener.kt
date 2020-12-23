@@ -30,6 +30,8 @@ class ServiceStartPromiseListener(
             val event = future.get()
             val service = event.cloudService
 
+            sendPlayers(encounter.firstTeam, service)
+            sendPlayers(encounter.secondTeam, service)
             SCHEDULED_EXECUTOR.schedule({
                 sendPlayers(encounter.firstTeam, service)
                 sendPlayers(encounter.secondTeam, service)
