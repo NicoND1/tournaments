@@ -1,6 +1,7 @@
 package de.bytemc.tournaments.api
 
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
+import eu.thesimplecloud.jsonlib.JsonLibExclude
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -15,6 +16,7 @@ import kotlin.math.pow
 data class TournamentCreator(val uuid: UUID, val name: String)
 
 data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentParticipant>) {
+    @JsonLibExclude
     val participantsLock = ReentrantLock()
 
     fun isEmpty() = participants.isEmpty()
