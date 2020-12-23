@@ -14,14 +14,14 @@ import kotlin.concurrent.withLock
  */
 class PacketInAddTeamParticipant : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val tournament = ServerTournamentAPI.instance.findTournament(id)
 
         if (tournament != null) {
-            return success(addToTournament(tournament, connection))
+            return success(BooleanResult(addToTournament(tournament, connection)))
         }
-        return success(false)
+        return success(BooleanResult.FALSE)
     }
 
     private fun addToTournament(tournament: ServerTournament, connection: IConnection): Boolean {

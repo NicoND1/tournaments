@@ -19,16 +19,16 @@ class LobbyTournament(
     teams: List<TournamentTeam>,
 ) : AbstractTournament(id, creator, settings, teams) {
 
-    fun setState(newState: TournamentState): ICommunicationPromise<Boolean> {
-        return sendPacket(PacketOutSetState(this, newState), Boolean::class.java)
+    fun setState(newState: TournamentState): ICommunicationPromise<BooleanResult> {
+        return sendPacket(PacketOutSetState(this, newState), BooleanResult::class.java)
     }
 
-    fun addToTeam(player: Player, team: TournamentTeam): ICommunicationPromise<Boolean> {
-        return sendPacket(PacketOutAddTeamParticipant(this, team, player.toParticipant()), Boolean::class.java)
+    fun addToTeam(player: Player, team: TournamentTeam): ICommunicationPromise<BooleanResult> {
+        return sendPacket(PacketOutAddTeamParticipant(this, team, player.toParticipant()), BooleanResult::class.java)
     }
 
-    fun removeFromTeam(player: Player, team: TournamentTeam): ICommunicationPromise<Boolean> {
-        return sendPacket(PacketOutRemoveTeamParticipant(this, team, player.toParticipant()), Boolean::class.java)
+    fun removeFromTeam(player: Player, team: TournamentTeam): ICommunicationPromise<BooleanResult> {
+        return sendPacket(PacketOutRemoveTeamParticipant(this, team, player.toParticipant()), BooleanResult::class.java)
     }
 
     fun sendPacket(packet: IPacket): ICommunicationPromise<Unit> {

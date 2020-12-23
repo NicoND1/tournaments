@@ -2,35 +2,42 @@ package de.bytemc.tournaments.common.protocol
 
 import de.bytemc.tournaments.api.*
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
-import eu.thesimplecloud.clientserverapi.lib.packet.packettype.JsonPacket
+import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 import java.util.*
 
 /**
  * @author Nico_ND1
  */
-class PacketOutCreateTournament : JsonPacket {
+class PacketOutCreateTournament : BytePacket {
 
     constructor(tournament: ITournament) {
-        jsonLib.append("id", tournament.id())
-        jsonLib.append("state", tournament.state())
-        jsonLib.append("creator", tournament.creator())
-        jsonLib.append("settings", tournament.settings())
-        jsonLib.append("teams", tournament.teams())
+        init(tournament.id(), tournament.creator(), tournament.settings())
     }
 
-    constructor(
+    constructor(id: UUID, creator: TournamentCreator, settings: TournamentSettings) {
+        init(id, creator, settings)
+    }
+
+    private fun init(
         id: UUID,
-        state: TournamentState,
         creator: TournamentCreator,
         settings: TournamentSettings,
-        teams: List<TournamentTeam>,
     ) {
-        jsonLib.append("id", id)
-        jsonLib.append("state", state)
-        jsonLib.append("creator", creator)
-        jsonLib.append("settings", settings)
-        jsonLib.append("teams", teams)
+        writeUUID(id)
+        writeUUID(creator.uuid)
+        writeString(creator.name)
+        writeString(settings.game.name)
+        buffer.writeInt(settings.teamsOption.playersPerTeam)
+        buffer.writeInt(settings.teamsAmount)
+        writeMaps(settings.maps)
+    }
+
+    private fun writeMaps(maps: List<TournamentMap>) {
+        buffer.writeInt(maps.size)
+        for (map in maps) {
+            writeString(map.name)
+        }
     }
 
     constructor()

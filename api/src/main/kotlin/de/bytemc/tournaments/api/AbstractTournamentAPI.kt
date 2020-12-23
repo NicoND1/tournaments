@@ -19,11 +19,11 @@ abstract class AbstractTournamentAPI<Tournament> : ITournamentAPI<Tournament> wh
     }
 
     override fun findTournament(id: UUID): Tournament? {
-        return tournaments.first { tournament -> tournament.id() == id }
+        return tournaments.firstOrNull { tournament -> tournament.id() == id }
     }
 
     override fun findTournamentByCreator(creatorUUID: UUID): Tournament? {
-        return tournaments.first { tournament -> tournament.creator().uuid == creatorUUID }
+        return tournaments.firstOrNull { tournament -> tournament.creator().uuid == creatorUUID }
     }
 
 }

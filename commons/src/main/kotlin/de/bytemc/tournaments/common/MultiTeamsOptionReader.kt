@@ -32,10 +32,13 @@ class MultiTeamsOptionReader {
                 maps.add(TournamentMap(mapName))
             }
 
-            result.add(TournamentTeamsOption(serviceInfo.getSize(sizeName),
-                maps,
-                "${serviceInfo.servicePrefix}-$sizeName")
-            )
+            val size = serviceInfo.getSize(sizeName)
+            if (size != -1) {
+                result.add(TournamentTeamsOption(size,
+                    maps,
+                    "${serviceInfo.servicePrefix}-$sizeName")
+                )
+            }
         }
 
         return result
@@ -43,7 +46,7 @@ class MultiTeamsOptionReader {
 
     private data class ServiceInfo(val servicePrefix: String, val sizes: Map<String, Int>) {
         fun getSize(name: String): Int {
-            return sizes[name] ?: 1
+            return sizes[name] ?: -1
         }
     }
 

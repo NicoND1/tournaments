@@ -35,7 +35,7 @@ class SelectTeamsAmountInventory(
 
     private fun setAmountItem() {
         val rounds = Math.log(amount.get().toDouble()) / LOG_OF_TWO
-        val isFair = rounds.toInt() == rounds.toDouble().toInt()
+        val isFair = rounds.toInt().toDouble() == rounds
 
         val lore: ArrayList<String> = arrayListOf()
         lore.add("§7Klicke hier, um fortzufahren")
@@ -51,7 +51,7 @@ class SelectTeamsAmountInventory(
             .setName(player.format("Teams§8: §7${amount.get()}")).setLore(lore)
             .toItemStack()) {
             override fun onClick(player: Player, itemStack: ItemStack): ClickResult {
-                context.teamsAmount(amount.get())
+                SelectMapsInventory(player, context.teamsAmount(amount.get())).open(player)
                 return ClickResult.CANCEL
             }
         })

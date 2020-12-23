@@ -13,17 +13,17 @@ import kotlin.concurrent.withLock
  */
 class PacketInAddTeamParticipant : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val tournament = LobbyTournamentAPI.instance.findTournament(id)
 
         if (tournament != null) {
             return success(addToTournament(tournament))
         }
-        return success(false)
+        return success(BooleanResult.FALSE)
     }
 
-    private fun addToTournament(tournament: LobbyTournament): Boolean {
+    private fun addToTournament(tournament: LobbyTournament): BooleanResult {
         val teamID = buffer.readInt()
         for (team in tournament.teams()) {
             if (team.id == teamID) {
@@ -31,18 +31,18 @@ class PacketInAddTeamParticipant : BytePacket() {
             }
         }
 
-        return false
+        return BooleanResult.FALSE
     }
 
-    private fun addToTeam(team: TournamentTeam): Boolean {
+    private fun addToTeam(team: TournamentTeam): BooleanResult {
         val participant = readParticipant()
         if (team.participants.contains(participant)) {
-            return false
+            return BooleanResult.FALSE
         }
 
         team.participantsLock.withLock { team.participants.add(participant) }
         // TODO: Update inventories
-        return true
+        return BooleanResult.TRUE
     }
 
     private fun readParticipant(): TournamentParticipant {

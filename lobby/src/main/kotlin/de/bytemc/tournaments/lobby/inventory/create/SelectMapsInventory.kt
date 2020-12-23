@@ -30,7 +30,10 @@ class SelectMapsInventory(
     *IntStream.rangeClosed(9, 26).toArray()) {
 
     init {
-        setItem(31, object : ClickableItem(ItemCreator(Material.INK_SACK, 10)
+        design(player, 30, 0, 3)
+        init()
+
+        setItem(32, object : ClickableItem(ItemCreator(Material.INK_SACK, 1, 10)
             .setName(player.format("§lTurnier erstellen"))
             .toItemStack()) {
             override fun onClick(player: Player, itemStack: ItemStack): ClickResult {
@@ -39,15 +42,12 @@ class SelectMapsInventory(
                 return ClickResult.CANCEL
             }
         })
-
-        design(player, 31, 0, 3)
-        init()
     }
 
     private fun createTournament() {
         val creator = TournamentCreator(player.uniqueId, player.name)
         LobbyTournamentAPI.instance.createTournament(creator, context.build()).addResultListener {
-            if (it) {
+            if (it.result) {
                 val components = ComponentBuilder("Turnier wurde erstellt.\n ")
                     .append("[Verwalten]").event(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament manage"))
                     .create()

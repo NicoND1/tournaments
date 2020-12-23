@@ -3,6 +3,7 @@ package de.bytemc.tournaments.lobby.inventory
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import de.bytemc.core.entitiesutils.items.ItemCreator
+import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentParticipant
 import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
@@ -27,7 +28,7 @@ class TeamsInventory(
     "Teams",
     34,
     33,
-    *IntStream.rangeClosed(9, 26).toArray()) {
+    *IntStream.rangeClosed(9, 26).toArray()), ITournamentInventory {
 
     init {
         design(player, 31, 0, 3)
@@ -110,6 +111,10 @@ class TeamsInventory(
         } else {
             NUMBERS[number]
         }
+    }
+
+    override fun getTournament(): ITournament {
+        return tournament
     }
 
 }

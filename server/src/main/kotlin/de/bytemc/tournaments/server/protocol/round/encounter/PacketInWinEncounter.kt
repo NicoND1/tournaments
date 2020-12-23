@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.server.protocol.round.encounter
 
+import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.readUUID
 import de.bytemc.tournaments.server.ServerTournament
@@ -14,7 +15,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
  */
 class PacketInWinEncounter : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val tournament = ServerTournamentAPI.instance.findTournament(id)
 
@@ -25,7 +26,7 @@ class PacketInWinEncounter : BytePacket() {
         }
     }
 
-    private fun findEncounter(tournament: ServerTournament): ICommunicationPromise<Boolean> {
+    private fun findEncounter(tournament: ServerTournament): ICommunicationPromise<BooleanResult> {
         val encounterID = buffer.readInt()
         val round = tournament.currentRound()
 
@@ -37,20 +38,23 @@ class PacketInWinEncounter : BytePacket() {
             }
         }
 
-        return success(false)
+        return success(BooleanResult.FALSE)
     }
 
-    private fun findTeam(tournament: ServerTournament, encounter: TournamentEncounter): ICommunicationPromise<Boolean> {
+    private fun findTeam(
+        tournament: ServerTournament,
+        encounter: TournamentEncounter,
+    ): ICommunicationPromise<BooleanResult> {
         val teamID = buffer.readInt()
 
         return when {
             encounter.firstTeam.id == teamID -> {
                 encounter.setWinnerTeam(tournament, encounter.firstTeam)
-                success(true)
+                success(BooleanResult.TRUE)
             }
             encounter.secondTeam.id == teamID -> {
                 encounter.setWinnerTeam(tournament, encounter.secondTeam)
-                success(true)
+                success(BooleanResult.TRUE)
             }
             else -> {
                 failure(NullPointerException("Couldn't find winner team for $tournament $encounter $teamID"))

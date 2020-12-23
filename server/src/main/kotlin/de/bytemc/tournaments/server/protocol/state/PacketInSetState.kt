@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.server.protocol.state
 
+import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.TournamentState
 import de.bytemc.tournaments.api.readUUID
 import de.bytemc.tournaments.server.ServerTournamentAPI
@@ -13,16 +14,16 @@ import java.util.*
  */
 class PacketInSetState : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val state = TournamentState.values()[buffer.readInt()]
 
         return success(findAndUpdate(id, state))
     }
 
-    private fun findAndUpdate(id: UUID, state: TournamentState): Boolean {
+    private fun findAndUpdate(id: UUID, state: TournamentState): BooleanResult {
         val tournament = ServerTournamentAPI.instance.findTournament(id)
-        return tournament?.setState(state) ?: false
+        return BooleanResult.from(tournament?.setState(state) ?: false)
     }
 
 }

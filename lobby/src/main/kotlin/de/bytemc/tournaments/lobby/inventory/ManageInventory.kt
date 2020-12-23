@@ -5,6 +5,7 @@ import de.bytemc.core.entitiesutils.inventories.ClickResult
 import de.bytemc.core.entitiesutils.inventories.ClickableItem
 import de.bytemc.core.entitiesutils.inventories.NoneClickableItem
 import de.bytemc.core.entitiesutils.items.ItemCreator
+import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentState
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
@@ -19,7 +20,8 @@ import java.util.concurrent.TimeUnit
  * @author Nico_ND1
  */
 class ManageInventory(val player: Player, val tournament: LobbyTournament) :
-    ClickInventory(3 * 9, player.format("Turnier von ${player.primaryColor()}${tournament.creator().name}")) {
+    ClickInventory(3 * 9, player.format("Turnier von ${player.primaryColor()}${tournament.creator().name}")),
+    ITournamentInventory {
 
     private var participationCooldown: Long = 0L
 
@@ -139,6 +141,10 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
         }
 
         return ItemCreator(material).setName(player.format(text)).toItemStack()
+    }
+
+    override fun getTournament(): ITournament {
+        return tournament
     }
 
 }

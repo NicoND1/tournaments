@@ -1,9 +1,6 @@
 package de.bytemc.tournaments.lobby.protocol.team
 
-import de.bytemc.tournaments.api.ITournament
-import de.bytemc.tournaments.api.TournamentParticipant
-import de.bytemc.tournaments.api.TournamentTeam
-import de.bytemc.tournaments.api.readUUID
+import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
@@ -15,17 +12,17 @@ import kotlin.concurrent.withLock
  */
 class PacketInRemoveTeamParticipant : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val tournament = LobbyTournamentAPI.instance.findTournament(id)
 
         if (tournament != null) {
             return success(removeFromTournament(tournament))
         }
-        return success(false)
+        return success(BooleanResult.FALSE)
     }
 
-    private fun removeFromTournament(tournament: ITournament): Boolean {
+    private fun removeFromTournament(tournament: ITournament): BooleanResult {
         val teamID = buffer.readInt()
         for (team in tournament.teams()) {
             if (team.id == teamID) {
@@ -33,10 +30,10 @@ class PacketInRemoveTeamParticipant : BytePacket() {
             }
         }
 
-        return false
+        return BooleanResult.FALSE
     }
 
-    private fun removeFromTeam(team: TournamentTeam): Boolean {
+    private fun removeFromTeam(team: TournamentTeam): BooleanResult {
         val participantID = readUUID()
 
         var participant: TournamentParticipant? = null
@@ -47,11 +44,11 @@ class PacketInRemoveTeamParticipant : BytePacket() {
         }
 
         if (participant == null) {
-            return false
+            return BooleanResult.FALSE
         } else {
             team.participantsLock.withLock { team.participants.remove(participant) }
         }
-        return true
+        return BooleanResult.TRUE
     }
 
 }

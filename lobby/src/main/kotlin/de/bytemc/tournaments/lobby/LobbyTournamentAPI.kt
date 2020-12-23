@@ -1,12 +1,15 @@
 package de.bytemc.tournaments.lobby
 
+import de.bytemc.core.entitiesutils.inventories.ClickInventory
 import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.common.MultiTeamsOptionReader
 import de.bytemc.tournaments.common.protocol.PacketOutCreateTournament
+import de.bytemc.tournaments.lobby.inventory.ITournamentInventory
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.CommunicationPromise
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 import eu.thesimplecloud.plugin.startup.CloudPlugin
+import org.bukkit.Bukkit
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.ArrayList
@@ -30,9 +33,12 @@ class LobbyTournamentAPI : AbstractTournamentAPI<LobbyTournament>() {
 
     override fun allGames() = games
 
-    fun createTournament(creator: TournamentCreator, settings: TournamentSettings): ICommunicationPromise<Boolean> {
+    fun createTournament(
+        creator: TournamentCreator,
+        settings: TournamentSettings,
+    ): ICommunicationPromise<BooleanResult> {
         if (findTournamentByCreator(creator.uuid) != null) {
-            return CommunicationPromise(result = false)
+            return CommunicationPromise(result = BooleanResult.FALSE)
         }
 
         val id = UUID.randomUUID()
@@ -41,8 +47,8 @@ class LobbyTournamentAPI : AbstractTournamentAPI<LobbyTournament>() {
             teams.add(TournamentTeam(i, arrayListOf()))
         }
 
-        val packet = PacketOutCreateTournament(id, TournamentState.COLLECTING, creator, settings, teams)
-        return sendPacket(packet, Boolean::class.java)
+        val packet = PacketOutCreateTournament(id, creator, settings)
+        return sendPacket(packet, BooleanResult::class.java)
     }
 
     fun addTournament(tournament: LobbyTournament) {
@@ -52,7 +58,15 @@ class LobbyTournamentAPI : AbstractTournamentAPI<LobbyTournament>() {
     fun deleteTournament(tournament: ITournament) {
         creationLock.withLock { tournaments.remove(tournament) }
 
-        // TODO: Close inventories for players who are looking at this tournament
+        for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+            ClickInventory.getClickInventory(onlinePlayer.uniqueId).ifPresent {
+                if (it is ITournamentInventory) {
+                    if (it.getTournament().id() == tournament.id()) {
+                        onlinePlayer.closeInventory()
+                    }
+                }
+            }
+        }
     }
 
     fun sendPacket(packet: IPacket): ICommunicationPromise<Unit> {

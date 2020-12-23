@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.lobby.protocol.round.encounter
 
+import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.readUUID
@@ -13,7 +14,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
  */
 class PacketInWinEncounter : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Boolean> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val tournament = LobbyTournamentAPI.instance.findTournament(id)
 
@@ -24,7 +25,7 @@ class PacketInWinEncounter : BytePacket() {
         }
     }
 
-    private fun findEncounter(tournament: ITournament): ICommunicationPromise<Boolean> {
+    private fun findEncounter(tournament: ITournament): ICommunicationPromise<BooleanResult> {
         val encounterID = buffer.readInt()
         val round = tournament.currentRound()
 
@@ -36,20 +37,23 @@ class PacketInWinEncounter : BytePacket() {
             }
         }
 
-        return success(false)
+        return success(BooleanResult.FALSE)
     }
 
-    private fun findTeam(tournament: ITournament, encounter: TournamentEncounter): ICommunicationPromise<Boolean> {
+    private fun findTeam(
+        tournament: ITournament,
+        encounter: TournamentEncounter,
+    ): ICommunicationPromise<BooleanResult> {
         val teamID = buffer.readInt()
 
         return when {
             encounter.firstTeam.id == teamID -> {
                 encounter.winnerTeam = encounter.firstTeam
-                success(true)
+                success(BooleanResult.TRUE)
             }
             encounter.secondTeam.id == teamID -> {
                 encounter.winnerTeam = encounter.secondTeam
-                success(true)
+                success(BooleanResult.TRUE)
             }
             else -> {
                 failure(NullPointerException("Couldn't find winner team for $tournament $encounter $teamID"))

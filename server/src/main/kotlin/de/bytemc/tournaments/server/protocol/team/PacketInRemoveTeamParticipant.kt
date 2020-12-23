@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.server.protocol.team
 
+import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.TournamentParticipant
 import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.api.readUUID
@@ -16,17 +17,17 @@ import kotlin.concurrent.withLock
  */
 class PacketInRemoveTeamParticipant : BytePacket() {
 
-    override suspend fun handle(connection: IConnection): ICommunicationPromise<Any> {
+    override suspend fun handle(connection: IConnection): ICommunicationPromise<BooleanResult> {
         val id = readUUID()
         val tournament = ServerTournamentAPI.instance.findTournament(id)
 
         if (tournament != null) {
             return success(removeFromTournament(tournament, connection))
         }
-        return success(false)
+        return success(BooleanResult.FALSE)
     }
 
-    private fun removeFromTournament(tournament: ServerTournament, connection: IConnection): Boolean {
+    private fun removeFromTournament(tournament: ServerTournament, connection: IConnection): BooleanResult {
         val teamID = buffer.readInt()
         for (team in tournament.teams()) {
             if (team.id == teamID) {
@@ -34,10 +35,14 @@ class PacketInRemoveTeamParticipant : BytePacket() {
             }
         }
 
-        return false
+        return BooleanResult.FALSE
     }
 
-    private fun removeFromTeam(tournament: ServerTournament, team: TournamentTeam, connection: IConnection): Boolean {
+    private fun removeFromTeam(
+        tournament: ServerTournament,
+        team: TournamentTeam,
+        connection: IConnection,
+    ): BooleanResult {
         val participantID = readUUID()
 
         var participant: TournamentParticipant? = null
@@ -48,13 +53,13 @@ class PacketInRemoveTeamParticipant : BytePacket() {
         }
 
         if (participant == null) {
-            return false
+            return BooleanResult.FALSE
         } else {
             team.participantsLock.withLock { team.participants.remove(participant) }
         }
 
         notifyExcept(tournament, team, participant, connection)
-        return true
+        return BooleanResult.TRUE
     }
 
     private fun notifyExcept(
