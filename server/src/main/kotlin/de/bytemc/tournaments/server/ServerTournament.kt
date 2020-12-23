@@ -90,7 +90,7 @@ class ServerTournament(
         }
 
         val maxRounds = settings().maxRounds()
-        if (maxRounds <= currentRound.count + 1) {
+        if (maxRounds < currentRound.count + 1) {
             notifyWinner(currentRound)
         } else {
             broadcast(object : BroadcastMessage {
