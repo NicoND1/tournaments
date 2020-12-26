@@ -19,6 +19,7 @@ import de.bytemc.tournaments.lobby.protocol.round.encounter.PacketInWinEncounter
 import de.bytemc.tournaments.lobby.protocol.state.PacketInSetState
 import de.bytemc.tournaments.lobby.protocol.team.PacketInAddTeamParticipant
 import de.bytemc.tournaments.lobby.protocol.team.PacketInRemoveTeamParticipant
+import de.bytemc.tournaments.lobby.protocol.team.PacketInTeamMembers
 import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.clientserverapi.lib.packetmanager.IPacketManager
 import org.bukkit.plugin.java.JavaPlugin
@@ -64,6 +65,8 @@ class TournamentLobbyPlugin : JavaPlugin() {
 
         packetManager.registerPacket(PacketOutEncounterMatches::class.java)
         packetManager.registerPacket(PacketInEncounterMatches::class.java)
+
+        packetManager.registerPacket(PacketInTeamMembers::class.java)
     }
 
 }

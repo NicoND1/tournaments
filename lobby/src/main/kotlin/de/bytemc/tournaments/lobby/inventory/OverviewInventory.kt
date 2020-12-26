@@ -22,7 +22,8 @@ class OverviewInventory(
 ) {
 
     init {
-        design(player, 22, 0, 2)
+        val backItemSlot = if (player.hasPermission("tournament.create")) 22 else -1
+        design(player, backItemSlot, 0, 2)
         init()
     }
 

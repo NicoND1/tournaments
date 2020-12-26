@@ -20,6 +20,7 @@ import de.bytemc.tournaments.server.protocol.round.encounter.PacketInWinEncounte
 import de.bytemc.tournaments.server.protocol.state.PacketInSetState
 import de.bytemc.tournaments.server.protocol.team.PacketInAddTeamParticipant
 import de.bytemc.tournaments.server.protocol.team.PacketInRemoveTeamParticipant
+import de.bytemc.tournaments.server.protocol.team.PacketOutTeamMembers
 import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.api.external.ICloudModule
 import eu.thesimplecloud.clientserverapi.lib.packetmanager.IPacketManager
@@ -66,6 +67,8 @@ class TournamentsServerModule : ICloudModule {
 
         packetManager.registerPacket(PacketOutEncounterMatches::class.java)
         packetManager.registerPacket(PacketInEncounterMatches::class.java)
+
+        packetManager.registerPacket(PacketOutTeamMembers::class.java)
     }
 
     override fun onDisable() {

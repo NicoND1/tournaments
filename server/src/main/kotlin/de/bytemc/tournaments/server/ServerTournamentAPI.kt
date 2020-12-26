@@ -5,6 +5,7 @@ import de.bytemc.tournaments.common.MultiTeamsOptionReader
 import de.bytemc.tournaments.common.protocol.PacketOutCreateTournament
 import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
+import de.bytemc.tournaments.server.protocol.team.PacketOutTeamMembers
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.CommunicationPromise
@@ -56,11 +57,22 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         listeningLock.withLock { listeningConnections.add(connection) }
 
         for (tournament in tournaments) {
-            connection.sendUnitQuery(PacketOutCreateTournament(tournament))
-            if (tournament.state() == TournamentState.PLAYING && tournament.currentRound() != null) {
-                connection.sendUnitQuery(PacketOutStartRound(tournament, tournament.currentRound()!!))
+            val packets: ArrayList<IPacket> = ArrayList()
+            packets.add(PacketOutCreateTournament(tournament))
+            if (tournament.teams().none { team -> team.participants.isEmpty() }) {
+                packets.add(PacketOutTeamMembers(tournament))
             }
+            if (tournament.state() == TournamentState.PLAYING && tournament.currentRound() != null) {
+                packets.add(PacketOutStartRound(tournament, tournament.currentRound()!!))
+            }
+
+            send(connection, packets)
         }
+    }
+
+    private fun send(connection: IConnection, packets: ArrayList<IPacket>) {
+        if (packets.isEmpty()) return
+        connection.sendUnitQuery(packets.removeAt(0)).addCompleteListener { send(connection, packets) }
     }
 
     fun stopListening(connection: IConnection) {
