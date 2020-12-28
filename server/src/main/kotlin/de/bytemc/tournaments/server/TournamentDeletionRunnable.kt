@@ -9,7 +9,7 @@ class TournamentDeletionRunnable : Runnable {
     override fun run() {
         for (tournament in ServerTournamentAPI.instance.tournaments(TournamentState.FINISHED)) {
             if (tournament.endTime != 0L && tournament.endTime < System.currentTimeMillis()) {
-                tournament.delete()
+                ServerTournamentAPI.instance.deleteTournament(tournament)
             }
         }
     }
