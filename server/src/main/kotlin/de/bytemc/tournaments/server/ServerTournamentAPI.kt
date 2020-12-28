@@ -5,7 +5,9 @@ import de.bytemc.tournaments.common.MultiTeamsOptionReader
 import de.bytemc.tournaments.common.protocol.PacketOutCreateTournament
 import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
+import de.bytemc.tournaments.server.event.TournamentDeleteEvent
 import de.bytemc.tournaments.server.protocol.team.PacketOutTeamMembers
+import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.CommunicationPromise
@@ -107,6 +109,8 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         creationLock.withLock { tournaments.remove(tournament) }
         tournament.delete()
         sendUnitPacket(PacketOutDeleteTournament(tournament.id()))
+
+        CloudAPI.instance.getEventManager().call(TournamentDeleteEvent(tournament))
     }
 
     init {

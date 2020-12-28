@@ -7,6 +7,8 @@ import de.bytemc.tournaments.common.broadcast.secondaryColor
 import de.bytemc.tournaments.common.protocol.round.PacketOutStartRound
 import de.bytemc.tournaments.common.protocol.round.encounter.PacketOutEncounterMatches
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
+import de.bytemc.tournaments.server.event.TournamentNextRoundEvent
+import de.bytemc.tournaments.server.event.TournamentStateChangeEvent
 import de.bytemc.tournaments.server.round.RoundPreparer
 import de.bytemc.tournaments.server.round.RoundStarter
 import eu.thesimplecloud.api.CloudAPI
@@ -30,6 +32,7 @@ class ServerTournament(
 ) : AbstractTournament(id, creator, settings, teams) {
 
     var endTime: Long = 0L
+    var winningTeam: TournamentTeam? = null
 
     fun setState(newState: TournamentState): Boolean {
         if (currentState == newState) {
@@ -69,8 +72,10 @@ class ServerTournament(
     private fun handleStateChange(state: TournamentState) {
         if (state == TournamentState.PLAYING) {
             startRound(1)
-        } else if(state == TournamentState.FINISHED) {
+            CloudAPI.instance.getEventManager().call(TournamentStateChangeEvent(this))
+        } else if (state == TournamentState.FINISHED) {
             endTime = System.currentTimeMillis()
+            CloudAPI.instance.getEventManager().call(TournamentStateChangeEvent(this))
         }
     }
 
@@ -82,6 +87,8 @@ class ServerTournament(
             val starter = RoundStarter(this, round)
             starter.start()
             sendUnitPacket(PacketOutEncounterMatches(this))
+
+            CloudAPI.instance.getEventManager().call(TournamentNextRoundEvent(this, round))
         }.addFailureListener {
             it.printStackTrace()
 
@@ -115,7 +122,6 @@ class ServerTournament(
     }
 
     private fun notifyWinner(currentRound: TournamentRound) {
-        var winningTeam: TournamentTeam? = null
         if (currentRound.encounters.size == 1) {
             winningTeam = currentRound.encounters[0].winnerTeam
         }
@@ -123,7 +129,7 @@ class ServerTournament(
         val winner = if (winningTeam == null) {
             "§cNiemand hat gewonnen."
         } else {
-            "§aTeam ${winningTeam.name()} hat gewonnen"
+            "§aTeam ${winningTeam!!.name()} hat gewonnen"
         }
 
         broadcast(object : BroadcastMessage {
