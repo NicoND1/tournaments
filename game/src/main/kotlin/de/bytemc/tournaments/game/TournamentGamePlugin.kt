@@ -24,8 +24,6 @@ class TournamentGamePlugin : JavaPlugin() {
         }
 
         matchData = property.getValue()
-        println(matchData!!.firstTeam)
-        println(matchData!!.secondTeam)
     }
 
     fun isTournamentMatch(): Boolean {

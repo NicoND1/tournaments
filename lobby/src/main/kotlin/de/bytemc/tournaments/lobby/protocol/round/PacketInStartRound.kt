@@ -37,7 +37,6 @@ class PacketInStartRound : BytePacket() {
             var winnerTeam: TournamentTeam? = null
 
             if (buffer.readBoolean()) winnerTeam = tournament.findTeam(buffer.readInt())
-            println("$i $id $firstTeamID $firstTeam $secondTeamID $secondTeam")
             result[i] = TournamentEncounter(id, firstTeam!!, secondTeam!!, winnerTeam)
         }
 

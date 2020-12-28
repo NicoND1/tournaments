@@ -31,9 +31,6 @@ fun TournamentEncounter.setWinnerTeam(tournament: ServerTournament, winnerTeam: 
     if (this.winnerTeam != null) return
     this.winnerTeam = winnerTeam
 
-    NullPointerException("setWinnerTeam to " + winnerTeam.participants.map { par -> par.name }
-        .toCollection(ArrayList())).printStackTrace()
-
     tournament.sendUnitPacket(PacketOutWinEncounter(tournament.id(),
         tournament.currentRound()?.count ?: 0,
         this.id,

@@ -106,10 +106,8 @@ class ServerTournament(
         }
 
         val maxRounds = settings().maxRounds()
-        println("$maxRounds ${currentRound.count}")
         if (currentRound.count == maxRounds) {
             notifyWinner(currentRound)
-            println("Notify winner")
         } else {
             broadcast(object : BroadcastMessage {
                 override fun message(player: ICloudPlayer): String {
