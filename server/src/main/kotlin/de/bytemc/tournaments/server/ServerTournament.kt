@@ -29,6 +29,8 @@ class ServerTournament(
     teams: List<TournamentTeam>,
 ) : AbstractTournament(id, creator, settings, teams) {
 
+    var endTime: Long = 0L
+
     fun setState(newState: TournamentState): Boolean {
         if (currentState == newState) {
             return false
@@ -67,6 +69,8 @@ class ServerTournament(
     private fun handleStateChange(state: TournamentState) {
         if (state == TournamentState.PLAYING) {
             startRound(1)
+        } else if(state == TournamentState.FINISHED) {
+            endTime = System.currentTimeMillis()
         }
     }
 

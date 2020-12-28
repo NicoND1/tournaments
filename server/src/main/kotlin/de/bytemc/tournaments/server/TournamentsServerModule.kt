@@ -25,6 +25,8 @@ import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.api.external.ICloudModule
 import eu.thesimplecloud.clientserverapi.lib.packetmanager.IPacketManager
 import eu.thesimplecloud.launcher.startup.Launcher
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Nico_ND1
@@ -38,6 +40,9 @@ class TournamentsServerModule : ICloudModule {
         Launcher.instance.commandManager.registerCommand(this, TournamentDebugCommand())
 
         ServerTournamentAPI()
+
+        Executors.newSingleThreadScheduledExecutor()
+            .scheduleAtFixedRate(TournamentDeletionRunnable(), 5L, 5L, TimeUnit.SECONDS)
     }
 
     private fun registerPackets(packetManager: IPacketManager) {

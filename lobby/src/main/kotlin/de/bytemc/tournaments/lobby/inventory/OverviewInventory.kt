@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.lobby.inventory
 
+import de.bytemc.core.entitiesutils.inventories.NoneClickableItem
 import de.bytemc.core.entitiesutils.items.ItemCreator
 import de.bytemc.tournaments.lobby.LobbyTournament
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
@@ -25,6 +26,12 @@ class OverviewInventory(
         val backItemSlot = if (player.hasPermission("tournament.create")) 22 else -1
         design(player, backItemSlot, 0, 2)
         init()
+
+        if (LobbyTournamentAPI.instance.tournaments().isEmpty()) {
+            setItem(13,
+                NoneClickableItem(ItemCreator(Material.BARRIER).setName(player.format("§cKein Turnier vorhanden"))
+                    .toItemStack()))
+        }
     }
 
     override fun onClick(p0: Player, p1: LobbyTournament) {
