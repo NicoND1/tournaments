@@ -9,6 +9,7 @@ import de.bytemc.core.entitiesutils.items.ItemCreator
 import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentState
+import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
@@ -88,9 +89,8 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
         if (tournament.state() == TournamentState.COLLECTING) {
             setItem(15, object : ClickableItem(PLAY_HEAD.setName(player.format("Turnier starten")).toItemStack()) {
                 override fun onClick(p0: Player, p1: ItemStack): ClickResult {
-                    tournament.setState(TournamentState.PLAYING).addResultListener {
-
-                    }.throwFailure()
+                    tournament.setState(TournamentState.PLAYING)
+                    //tryStart() TODO: Uncomment after finished with testing
                     return ClickResult.CANCEL
                 }
             })
@@ -98,6 +98,17 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
             val item = PLAYING_HEAD.setName(player.format("§cTurnier ist bereits gestartet")).toItemStack()
             setItem(15, NoneClickableItem(item))
         }
+    }
+
+    private fun tryStart() {
+        val emptyCount = tournament.teams().count(TournamentTeam::isEmpty)
+        val maxEmptyCount = tournament.teams().size / 2 - 1
+        if (emptyCount > maxEmptyCount) {
+            player.sendMessage("Zu viele leere Teams")
+            return
+        }
+
+        tournament.setState(TournamentState.PLAYING).throwFailure()
     }
 
     private fun setPairingItem() {
