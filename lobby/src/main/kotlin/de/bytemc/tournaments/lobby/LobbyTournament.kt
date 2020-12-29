@@ -1,12 +1,15 @@
 package de.bytemc.tournaments.lobby
 
+import de.bytemc.core.entitiesutils.inventories.ClickInventory
 import de.bytemc.tournaments.api.*
 import de.bytemc.tournaments.common.protocol.state.PacketOutSetState
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
+import de.bytemc.tournaments.lobby.inventory.IUpdatingTournamentInventory
 import de.bytemc.tournaments.lobby.inventory.pairing.TournamentPairings
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -40,6 +43,18 @@ class LobbyTournament(
 
     fun <T : Any> sendPacket(packet: IPacket, clazz: Class<T>): ICommunicationPromise<T> {
         return LobbyTournamentAPI.instance.sendPacket(packet, clazz)
+    }
+
+    fun updateAllInventories() {
+        for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+            ClickInventory.getClickInventory(onlinePlayer.uniqueId).ifPresent {
+                if (it is IUpdatingTournamentInventory) {
+                    if (it.getTournament().id() == id()) {
+                        it.updateItems()
+                    }
+                }
+            }
+        }
     }
 
 }

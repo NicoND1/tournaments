@@ -25,6 +25,7 @@ class PacketInSetState : BytePacket() {
         val tournament = LobbyTournamentAPI.instance.findTournament(id)
         if (tournament != null) {
             tournament.currentState = state
+            tournament.updateAllInventories()
             return BooleanResult.TRUE
         }
         return BooleanResult.FALSE

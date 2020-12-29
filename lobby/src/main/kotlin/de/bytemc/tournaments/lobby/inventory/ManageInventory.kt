@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
  */
 class ManageInventory(val player: Player, val tournament: LobbyTournament) :
     ClickInventory(3 * 9, player.format("Turnier von ${player.primaryColor()}${tournament.creator().name}")),
-    ITournamentInventory {
+    IUpdatingTournamentInventory {
 
     private var participationCooldown: Long = 0L
 
@@ -44,6 +44,11 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
             setDeletionItem()
             setActionItem()
         }
+    }
+
+    override fun updateItems() {
+        setItems()
+        player.updateInventory()
     }
 
     override fun openSilent(player: Player?) {
