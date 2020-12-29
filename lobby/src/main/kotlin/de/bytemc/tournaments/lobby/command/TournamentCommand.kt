@@ -27,7 +27,6 @@ class TournamentCommand : CommandExecutor {
         }
 
         val hasPermission = sender.hasPermission("tournament.create")
-
         if (hasPermission && args.size == 1 && args[0] == "manage") {
             val tournament = LobbyTournamentAPI.instance.findTournamentByCreator(sender.uniqueId)
 
