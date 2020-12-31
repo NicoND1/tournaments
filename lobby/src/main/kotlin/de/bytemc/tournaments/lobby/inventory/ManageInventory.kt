@@ -100,7 +100,8 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
             ClickableItem(ItemCreator(Material.GOLD_HELMET).setName(player.format("Paarungen")).toItemStack()) {
             override fun onClick(player: Player, itemStack: ItemStack): ClickResult {
                 if (tournament.state() == TournamentState.COLLECTING) {
-                    player.sendMessage("Ja ne")
+                    val bytePlayer = ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]
+                    if (bytePlayer != null) player.sendMessage(bytePlayer.getPrefix("Lobby") + "Das Tunier hat noch nicht Angefangen§8.")
                 } else {
                     PairingInventory(tournament,
                         ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]!!).open(player)
@@ -113,11 +114,17 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
     private fun setParticipationItem() {
         setItem(12, object : ClickableItem(getParticipationItem()) {
             override fun onClick(p0: Player, p1: ItemStack): ClickResult {
+
+
+                val bytePlayer = ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]
+                val p0Byte = ByteAPI.getInstance().bytePlayerManager.players[p0.uniqueId]
+
+
                 if (tournament.state() != TournamentState.COLLECTING) {
-                    p0.sendMessage("Das Turnier ist nicht betretbar")
+                    if (p0Byte != null) p0.sendMessage(p0Byte.getPrefix("Lobby") + "§7Das Turnier ist nicht betretbar§8.")
                 } else {
                     if (participationCooldown > System.currentTimeMillis()) {
-                        player.sendMessage("COOLDOWN JUNGE")
+                        if (bytePlayer != null) player.sendMessage(bytePlayer.getPrefix("Lobby") + "Bitte warte einen moment§8...")
                         player.playSound(player.location, Sound.VILLAGER_NO, 1f, 1f)
                         return ClickResult.CANCEL
                     }
@@ -127,7 +134,7 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
                     val packet = if (team == null) {
                         val freeTeam = tournament.teams().firstOrNull { aTeam -> aTeam.isEmpty() }
                         if (freeTeam == null) {
-                            player.sendMessage("Kein freies Team gefunden")
+                            if (bytePlayer != null) player.sendMessage(bytePlayer.getPrefix("Lobby") + "§7Kein freies Team gefunden§8.")
                             return ClickResult.CANCEL
                         }
 

@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.lobby.inventory.create
 
+import de.bytemc.core.ByteAPI
 import de.bytemc.core.entitiesutils.inventories.ClickResult
 import de.bytemc.core.entitiesutils.inventories.ClickableItem
 import de.bytemc.core.entitiesutils.items.ItemCreator
@@ -53,12 +54,15 @@ class SelectMapsInventory(
         val creator = TournamentCreator(player.uniqueId, player.name)
         LobbyTournamentAPI.instance.createTournament(creator, context.build()).addResultListener {
             if (it.result) {
-                val components = ComponentBuilder("Turnier wurde erstellt.\n ")
-                    .append("[Verwalten]").event(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament manage"))
+
+                val bytePlayer = ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]
+
+                val components = ComponentBuilder((bytePlayer?.getPrefix("Lobby") ?: "§8» ") + "§7Dein Turnier wurde erstellt§8.\n ")
+                    .append("§8» " + (bytePlayer?.secondColor ?: "§6") + "HIER Verwalten").event(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament manage"))
                     .create()
                 player.spigot().sendMessage(*components)
             } else {
-                player.sendMessage("Turnier konnte nicht erstellt werden")
+                player.sendMessage("§8» §7Turnier konnte nicht erstellt werden§8.")
             }
         }
     }
