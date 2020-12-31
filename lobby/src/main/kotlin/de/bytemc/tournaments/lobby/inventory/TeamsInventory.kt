@@ -1,5 +1,6 @@
 package de.bytemc.tournaments.lobby.inventory
 
+import de.bytemc.core.ByteAPI
 import de.bytemc.core.entitiesutils.items.ItemCreator
 import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.ITournament
@@ -42,7 +43,9 @@ class TeamsInventory(
             return
         }
         if (participationCooldown > System.currentTimeMillis()) {
-            player.sendMessage("COOLDOWN JUNGE")
+            val bytePlayer = ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]
+
+            player.sendMessage((bytePlayer?.getPrefix("Lobby") ?: "§8» ") + "§7Bitte warte einen moment§8...")
             player.playSound(player.location, Sound.VILLAGER_NO, 1f, 1f)
             return
         }
