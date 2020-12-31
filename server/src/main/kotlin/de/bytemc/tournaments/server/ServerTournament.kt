@@ -13,6 +13,7 @@ import de.bytemc.tournaments.server.round.RoundPreparer
 import de.bytemc.tournaments.server.round.RoundStarter
 import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.api.player.ICloudPlayer
+import eu.thesimplecloud.api.service.ICloudService
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.IPacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
@@ -33,6 +34,7 @@ class ServerTournament(
 
     var endTime: Long = 0L
     var winningTeam: TournamentTeam? = null
+    var tournamentLobby: String? = null
 
     fun setState(newState: TournamentState): Boolean {
         if (currentState == newState) {
@@ -73,9 +75,54 @@ class ServerTournament(
         if (state == TournamentState.PLAYING) {
             startRound(1)
             CloudAPI.instance.getEventManager().call(TournamentStateChangeEvent(this))
+            setTournamentLobby()
         } else if (state == TournamentState.FINISHED) {
             endTime = System.currentTimeMillis()
             CloudAPI.instance.getEventManager().call(TournamentStateChangeEvent(this))
+        }
+    }
+
+    private fun setTournamentLobby() {
+        val currentParticipantAmount = teams().sumBy { it.participants.size }
+        val group = CloudAPI.instance.getCloudServiceGroupManager().getServiceGroupByName("Tournament") ?: return
+        val services = group.getAllServices()
+
+        if (services.isNotEmpty()) {
+            val service = services.sortedByDescending {
+                val service = it
+                val usingTournaments = ServerTournamentAPI.instance.tournaments()
+                    .filter { it.tournamentLobby == service.getName() }
+                    .flatMap { it.teams() }
+                    .sumBy { it.participants.size }
+
+                if (service.getMaxPlayers() - usingTournaments > currentParticipantAmount) {
+                    1
+                } else {
+                    -1
+                }
+            }.reversed().firstOrNull() ?: return
+
+            tournamentLobby = service.getName()
+        }
+    }
+
+    fun getTournamentLobby(): ICloudService? {
+        if (tournamentLobby != null) {
+            return CloudAPI.instance.getCloudServiceManager().getCloudServiceByName(tournamentLobby!!)
+        }
+        return null
+    }
+
+    fun moveToLobby(vararg teams: TournamentTeam) {
+        val service = getTournamentLobby() ?: return
+
+        for (team in teams) {
+            for (participant in team.participants) {
+                val cloudPlayer = CloudAPI.instance.getCloudPlayerManager().getCachedCloudPlayer(participant.uuid)
+                    ?: continue
+
+                cloudPlayer.connect(service)
+            }
         }
     }
 
@@ -108,6 +155,7 @@ class ServerTournament(
         val maxRounds = settings().maxRounds()
         if (currentRound.count == maxRounds) {
             notifyWinner(currentRound)
+            setState(TournamentState.FINISHED)
         } else {
             broadcast(object : BroadcastMessage {
                 override fun message(player: ICloudPlayer): String {

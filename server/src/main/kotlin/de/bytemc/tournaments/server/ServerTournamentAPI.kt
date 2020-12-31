@@ -61,7 +61,7 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         for (tournament in tournaments) {
             val packets: ArrayList<IPacket> = ArrayList()
             packets.add(PacketOutCreateTournament(tournament))
-            if (tournament.teams().none { team -> team.participants.isEmpty() }) {
+            if (tournament.teams().any { team -> team.participants.isNotEmpty() }) {
                 packets.add(PacketOutTeamMembers(tournament))
             }
             if (tournament.state() == TournamentState.PLAYING && tournament.currentRound() != null) {
@@ -111,6 +111,10 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
         sendUnitPacket(PacketOutDeleteTournament(tournament.id()))
 
         CloudAPI.instance.getEventManager().call(TournamentDeleteEvent(tournament))
+    }
+
+    override fun toString(): String {
+        return "ServerTournamentAPI(listeningConnections=$listeningConnections, games=$games, tournaments=$tournaments)"
     }
 
     init {

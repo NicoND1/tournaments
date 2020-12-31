@@ -6,9 +6,11 @@ import de.bytemc.tournaments.api.readString
 import de.bytemc.tournaments.api.readUUID
 import de.bytemc.tournaments.lobby.LobbyTournament
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
+import de.bytemc.tournaments.lobby.TournamentLobbyPlugin
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
+import org.bukkit.plugin.java.JavaPlugin
 
 /**
  * @author Nico_ND1
@@ -25,6 +27,7 @@ class PacketInTeamMembers : BytePacket() {
 
     private fun readTeams(tournament: LobbyTournament) {
         val teamSize = buffer.readInt()
+        val plugin = JavaPlugin.getPlugin(TournamentLobbyPlugin::class.java)
 
         for (i in 0 until teamSize) {
             val teamID = buffer.readInt()
@@ -38,8 +41,9 @@ class PacketInTeamMembers : BytePacket() {
             val team = tournament.findTeam(teamID)
             team?.participants?.clear()
             team?.participants?.addAll(participants)
-        }
 
+            team?.let { plugin.collectives.handleTeamUpdate(it) }
+        }
     }
 
     private fun readParticipant(): TournamentParticipant {

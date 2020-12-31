@@ -22,7 +22,6 @@ class RoundPreparer(private val tournament: ServerTournament, private val count:
         var indexCount = 0
         for ((idCount, i) in (0..teams.size step 2).withIndex()) {
             if (i == teams.size) continue
-            Launcher.Companion.instance.logger.info("teamsSize=${teams.size} i=$i idCount=$idCount indexCount=$indexCount encounters=${encounters.size} matchCount=$matchCount")
             val firstEncounter = TournamentEncounter(idCount, teams[i], teams[i + 1])
 
             encounters[indexCount++] = firstEncounter

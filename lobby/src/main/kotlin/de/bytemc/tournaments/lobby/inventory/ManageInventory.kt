@@ -40,6 +40,7 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
         setTeamsItem()
         setParticipationItem()
         setPairingItem()
+        setTournamentLobbyItem()
 
         if (tournament.creator().uuid == player.uniqueId) {
             setDeletionItem()
@@ -187,8 +188,19 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
         return ItemCreator(material).setName(player.format(text)).toItemStack()
     }
 
-    override fun getTournament(): ITournament {
-        return tournament
+    private fun setTournamentLobbyItem() {
+        if (tournament.state() != TournamentState.COLLECTING) {
+            setItem(4, object : ClickableItem(ItemCreator(Material.SLIME_BALL)
+                .setName(player.format("Gemeinsame Lobby"))
+                .toItemStack()) {
+                override fun onClick(player: Player, itemStack: ItemStack): ClickResult {
+
+                    return ClickResult.CANCEL
+                }
+            })
+        }
     }
+
+    override fun getTournament(): ITournament = tournament
 
 }

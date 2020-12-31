@@ -5,9 +5,11 @@ import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentEncounter
 import de.bytemc.tournaments.api.readUUID
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
+import de.bytemc.tournaments.lobby.TournamentLobbyPlugin
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.BytePacket
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
+import org.bukkit.plugin.java.JavaPlugin
 
 /**
  * @author Nico_ND1
@@ -51,6 +53,9 @@ class PacketInWinEncounter : BytePacket() {
         encounter: TournamentEncounter,
     ): ICommunicationPromise<BooleanResult> {
         val teamID = buffer.readInt()
+
+        val plugin = JavaPlugin.getPlugin(TournamentLobbyPlugin::class.java)
+        plugin.collectives.handleEncounterWin(encounter)
 
         return when {
             encounter.firstTeam.id == teamID -> {

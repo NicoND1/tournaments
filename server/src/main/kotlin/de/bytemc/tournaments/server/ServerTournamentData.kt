@@ -36,6 +36,7 @@ fun TournamentEncounter.setWinnerTeam(tournament: ServerTournament, winnerTeam: 
         this.id,
         winnerTeam))
     tournament.testRoundOver()
+    tournament.moveToLobby(firstTeam, secondTeam)
 }
 
 fun TournamentEncounter.handleError(tournament: ServerTournament) {

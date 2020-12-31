@@ -1,11 +1,9 @@
 package de.bytemc.tournaments.lobby.inventory
 
-import com.mojang.authlib.GameProfile
-import com.mojang.authlib.properties.Property
 import de.bytemc.core.entitiesutils.items.ItemCreator
 import de.bytemc.tournaments.api.BooleanResult
 import de.bytemc.tournaments.api.ITournament
-import de.bytemc.tournaments.api.TournamentParticipant
+import de.bytemc.tournaments.api.TournamentState
 import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
@@ -40,6 +38,9 @@ class TeamsInventory(
     private var participationCooldown: Long = 0L
 
     override fun onClick(p0: Player, p1: TournamentTeam) {
+        if (tournament.state() != TournamentState.COLLECTING) {
+            return
+        }
         if (participationCooldown > System.currentTimeMillis()) {
             player.sendMessage("COOLDOWN JUNGE")
             player.playSound(player.location, Sound.VILLAGER_NO, 1f, 1f)
@@ -83,24 +84,10 @@ class TeamsInventory(
         val itemStack = item.toItemStack().clone()
         if (tournament.settings().teamsOption.playersPerTeam == 1 && !p0.isEmpty()) {
             val participant = p0.participants[0]
-            if (participant.texture != null) setSkullOwner(itemStack, participant)
+            if (participant.texture != null) participant.setSkullOwner(itemStack)
         }
 
         return itemStack
-    }
-
-    private fun setSkullOwner(itemStack: ItemStack, participant: TournamentParticipant) {
-        val texture = participant.texture!!
-        val property = Property(participant.name, texture.value, texture.signature)
-        val profile = GameProfile(participant.uuid, participant.name)
-        profile.properties.put("textures", property)
-
-        val itemMeta = itemStack.itemMeta
-        val field = itemMeta.javaClass.getDeclaredField("profile")
-        field.isAccessible = true
-        field.set(itemMeta, profile)
-
-        itemStack.itemMeta = itemMeta
     }
 
     companion object {

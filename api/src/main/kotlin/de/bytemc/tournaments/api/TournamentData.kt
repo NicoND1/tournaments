@@ -24,6 +24,19 @@ data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentPar
     fun name(): String {
         return participants.stream().map { participant -> participant.name }.collect(Collectors.joining(", "))
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as TournamentTeam
+        if (id != other.id) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id
+    }
+
 }
 
 data class TournamentParticipant(val uuid: UUID, val name: String, val texture: PlayerTexture? = null) {
@@ -78,7 +91,11 @@ enum class TournamentState {
     FINISHED
 }
 
-data class TournamentRound(val count: Int, val encounters: Array<TournamentEncounter>) {
+data class TournamentRound(
+    val count: Int,
+    val encounters: Array<TournamentEncounter>,
+    var parentRound: TournamentRound? = null,
+) {
     fun findEncounter(id: Int): TournamentEncounter? {
         return encounters.firstOrNull { encounter -> encounter.id == id }
     }

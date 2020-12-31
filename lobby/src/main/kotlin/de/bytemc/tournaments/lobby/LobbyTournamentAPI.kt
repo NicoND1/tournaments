@@ -10,6 +10,7 @@ import eu.thesimplecloud.clientserverapi.lib.promise.CommunicationPromise
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 import eu.thesimplecloud.plugin.startup.CloudPlugin
 import org.bukkit.Bukkit
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.ArrayList
@@ -57,6 +58,9 @@ class LobbyTournamentAPI : AbstractTournamentAPI<LobbyTournament>() {
 
     fun deleteTournament(tournament: ITournament) {
         creationLock.withLock { tournaments.remove(tournament) }
+
+        val plugin = JavaPlugin.getPlugin(TournamentLobbyPlugin::class.java)
+        plugin.collectives.handleDelete(tournament.id())
 
         for (onlinePlayer in Bukkit.getOnlinePlayers()) {
             ClickInventory.getClickInventory(onlinePlayer.uniqueId).ifPresent {
