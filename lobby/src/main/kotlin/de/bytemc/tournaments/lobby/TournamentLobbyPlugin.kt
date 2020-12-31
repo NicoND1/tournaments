@@ -49,8 +49,8 @@ class TournamentLobbyPlugin : JavaPlugin() {
 
         if (isCollectivesService()) {
             val repository = CollectivesPlayerRepository()
-            collectives = CollectivesImpl(repository)
-            server.pluginManager.registerEvents(CollectivesListener(repository), this)
+            collectives = CollectivesImpl(this, repository)
+            server.pluginManager.registerEvents(CollectivesListener(collectives as CollectivesImpl), this)
             server.pluginManager.registerEvents(CancelListener(), this)
             server.scheduler.runTaskTimerAsynchronously(this, ActionBarRunnable(repository), 2 * 20, 2 * 20)
         } else {

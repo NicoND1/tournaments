@@ -1,0 +1,7 @@
+spawnLocation:
+    world: 'world'
+    x: 0.5
+    y: 100.0
+    z: 0.5
+    yaw: 180.0
+    pitch: 0.0

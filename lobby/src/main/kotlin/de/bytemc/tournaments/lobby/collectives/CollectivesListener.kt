@@ -5,15 +5,25 @@ import de.bytemc.tournaments.lobby.collectives.player.CollectivesPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.AsyncPlayerChatEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.*
+import org.spigotmc.event.player.PlayerSpawnLocationEvent
 
 /**
  * @author Nico_ND1
  */
-class CollectivesListener(private val repository: ICollectivesRepository) : Listener {
+class CollectivesListener(private val collectivesImpl: CollectivesImpl) : Listener {
+
+    private val repository = collectivesImpl.repository()
+
+    @EventHandler
+    fun handleSpawnLocation(event: PlayerSpawnLocationEvent) {
+        event.spawnLocation = collectivesImpl.config.spawnLocation
+    }
+
+    @EventHandler
+    fun handleRespawn(event: PlayerRespawnEvent) {
+        event.respawnLocation = collectivesImpl.config.spawnLocation
+    }
 
     @EventHandler(priority = EventPriority.HIGH)
     fun handleJoin(event: PlayerJoinEvent) {

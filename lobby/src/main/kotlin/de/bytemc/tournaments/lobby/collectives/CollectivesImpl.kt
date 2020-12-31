@@ -11,7 +11,17 @@ import java.util.*
 /**
  * @author Nico_ND1
  */
-class CollectivesImpl(private val repository: ICollectivesRepository) : ICollectives {
+class CollectivesImpl(javaPlugin: JavaPlugin, private val repository: ICollectivesRepository) : ICollectives {
+
+    val config: CollectivesConfig
+
+    init {
+        javaPlugin.saveDefaultConfig()
+
+        val configuration = javaPlugin.config
+        config = CollectivesConfig(configuration.getConfigurationSection("spawnLocation"))
+    }
+
     override fun repository() = repository
 
     override fun handleRoundStart(tournament: LobbyTournament) {
