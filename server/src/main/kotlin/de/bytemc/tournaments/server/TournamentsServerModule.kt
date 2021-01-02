@@ -39,7 +39,7 @@ class TournamentsServerModule : ICloudModule {
         CloudAPI.instance.getEventManager().registerListener(this, ServicesListener())
 
         registerPackets(CloudAPI.instance.getThisSidesCommunicationBootstrap().getPacketManager())
-        Launcher.instance.commandManager.registerCommand(this, TournamentDebugCommand())
+        //Launcher.instance.commandManager.registerCommand(this, TournamentDebugCommand())
 
         ServerTournamentAPI()
 
