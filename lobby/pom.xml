@@ -11,6 +11,7 @@
 
   <groupId>de.bytemc.tournaments</groupId>
   <artifactId>lobby</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
 
   <repositories>
     <repository>
@@ -51,6 +52,12 @@
       <groupId>de.bytemc</groupId>
       <artifactId>core</artifactId>
       <version>1.0.2-20201223.153506-3</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.codergames</groupId>
+      <artifactId>responsive</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

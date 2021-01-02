@@ -12,6 +12,8 @@ interface ICollectives {
 
     fun repository(): ICollectivesRepository
 
+    fun handleStateUpdate(tournament: LobbyTournament)
+
     fun handleRoundStart(tournament: LobbyTournament)
 
     fun handleEncounterWin(encounter: TournamentEncounter)

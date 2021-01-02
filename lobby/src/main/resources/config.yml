@@ -5,3 +5,37 @@ spawnLocation:
     z: 0.5
     yaw: 180.0
     pitch: 0.0
+topList:
+    0:
+        location:
+            world: 'world'
+            x: 1.0
+            y: 104.0
+            z: -20.0
+            yaw: 0.0
+            pitch: 0.0
+        pose:
+            0:
+                x: 0.0
+                y: 0.0
+                z: 0.0
+            1:
+                x: 0.0
+                y: 0.0
+                z: 0.0
+            2:
+                x: 0.0
+                y: 0.0
+                z: 0.0
+            3:
+                x: 0.0
+                y: 0.0
+                z: 0.0
+            4:
+                x: 0.0
+                y: 0.0
+                z: 0.0
+            5:
+                x: 0.0
+                y: 0.0
+                z: 0.0

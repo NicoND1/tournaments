@@ -2,3 +2,4 @@ name: tournaments-game
 author: Nico_ND1
 version: ${project.version}
 main: de.bytemc.tournaments.game.TournamentGamePlugin
+depend: [ SimpleCloud-Plugin ]

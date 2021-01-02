@@ -45,5 +45,9 @@ abstract class AbstractTournament(
         return id.hashCode()
     }
 
+    override fun toString(): String {
+        return "AbstractTournament(id=$id, creator=$creator, settings=$settings, teams=$teams, currentRound=$currentRound, currentState=$currentState)"
+    }
+
 
 }

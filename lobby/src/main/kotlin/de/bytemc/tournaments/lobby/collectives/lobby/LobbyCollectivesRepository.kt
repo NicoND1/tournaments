@@ -18,4 +18,5 @@ class LobbyCollectivesRepository : ICollectivesRepository {
     }
 
     override fun findPlayer(player: Player): Nothing? = null
+    override fun findPlayer(uuid: UUID): Nothing? = null
 }

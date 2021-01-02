@@ -117,11 +117,13 @@ class ServerTournament(
         val service = getTournamentLobby() ?: return
 
         for (team in teams) {
-            for (participant in team.participants) {
-                val cloudPlayer = CloudAPI.instance.getCloudPlayerManager().getCachedCloudPlayer(participant.uuid)
-                    ?: continue
+            if (team.active) {
+                for (participant in team.participants) {
+                    val cloudPlayer = CloudAPI.instance.getCloudPlayerManager().getCachedCloudPlayer(participant.uuid)
+                        ?: continue
 
-                cloudPlayer.connect(service)
+                    cloudPlayer.connect(service)
+                }
             }
         }
     }
@@ -153,7 +155,7 @@ class ServerTournament(
         }
 
         val maxRounds = settings().maxRounds()
-        if (currentRound.count == maxRounds) {
+        if (currentRound.count == maxRounds) { // TODO: Send auto winners to tournament lobby
             notifyWinner(currentRound)
             setState(TournamentState.FINISHED)
         } else {

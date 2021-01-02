@@ -6,6 +6,8 @@ import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.lobby.LobbyTournament
 import de.bytemc.tournaments.lobby.TournamentLobbyPlugin
 import de.bytemc.tournaments.lobby.collectives.CollectivesScoreboard
+import de.bytemc.tournaments.lobby.collectives.ICollectives
+import de.bytemc.tournaments.lobby.inventory.EncountersInventory
 import de.bytemc.tournaments.lobby.inventory.PlayersInventory
 import de.bytemc.tournaments.lobby.inventory.TeamsInventory
 import eu.thesimplecloud.api.CloudAPI
@@ -16,29 +18,56 @@ import org.bukkit.plugin.java.JavaPlugin
 /**
  * @author Nico_ND1
  */
-data class CollectivesPlayer(val player: Player, val tournament: LobbyTournament) {
+data class CollectivesPlayer(
+    val player: Player,
+    val tournament: LobbyTournament,
+    var isPlaying: Boolean = false,
+    private val collectives: ICollectives,
+) {
 
     companion object {
         const val ALL_PLAYERS_SLOT = 0
         const val ALL_TEAMS_SLOT = 1
+        const val MATCHUPS_SLOT = 2
+        const val LOST_SLOT = 4
         const val BACK_TO_LOBBY_SLOT = 8
     }
 
     val bytePlayer = ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]!!
-    private val scoreboard = CollectivesScoreboard(this)
+    private val scoreboard = CollectivesScoreboard(this, collectives)
 
-    fun update() {
-        updateScoreboard()
+    fun update(collectives: ICollectives) {
+        findIsPlaying()
+        updateScoreboard(collectives)
 
         setAllPlayers()
         setAllTeams()
         setBackToLobby()
+        setLostItem()
+        setMatchups()
 
         hideOthers()
     }
 
-    fun updateScoreboard() {
-        scoreboard.update()
+    fun findIsPlaying() {
+        val team = getTeam()
+        val round = tournament.currentRound()
+        if (round != null) {
+            for (encounter in round.encounters) {
+                if (encounter.winnerTeam == team) {
+                    isPlaying = true
+                }
+            }
+            for (encounter in round.parentRound?.encounters ?: emptyArray()) {
+                if (encounter.winnerTeam == team) {
+                    isPlaying = true
+                }
+            }
+        }
+    }
+
+    fun updateScoreboard(collectives: ICollectives) {
+        scoreboard.update(collectives)
     }
 
     private fun hideOthers() {
@@ -83,6 +112,30 @@ data class CollectivesPlayer(val player: Player, val tournament: LobbyTournament
         CloudAPI.instance.getCloudPlayerManager().sendPlayerToLobby(cloudPlayer)
     }
 
+    private fun setLostItem() {
+        val team = getTeam()
+        val round = tournament.currentRound() ?: return
+
+        if (round.encounters.none { it.firstTeam == team || it.secondTeam == team }) { // TODO: Sometimes there or not
+            player.inventory.setItem(LOST_SLOT,
+                ItemCreator(Material.BARRIER).setName("§cDu bist ausgeschieden").toItemStack())
+        }
+    }
+
+    private fun setMatchups() {
+        player.inventory.setItem(MATCHUPS_SLOT,
+            ItemCreator(Material.COMPASS).setName("${color()}Runden").toItemStack())
+    }
+
+    fun matchups() {
+        val round = tournament.currentRound
+        if (round == null) {
+            player.sendMessage("Das Turnier hat noch nicht gestartet")
+        } else {
+            EncountersInventory(player, round.encounters.toCollection(ArrayList())).open(player)
+        }
+    }
+
     fun color(): String = bytePlayer.secondColor
 
     fun getTeam(): TournamentTeam {
@@ -99,5 +152,9 @@ data class CollectivesPlayer(val player: Player, val tournament: LobbyTournament
 
     override fun hashCode(): Int {
         return player.hashCode()
+    }
+
+    fun join(collectives: ICollectives) {
+        scoreboard.join(collectives)
     }
 }

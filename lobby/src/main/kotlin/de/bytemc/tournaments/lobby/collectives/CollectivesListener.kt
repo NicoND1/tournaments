@@ -2,9 +2,11 @@ package de.bytemc.tournaments.lobby.collectives
 
 import de.bytemc.tournaments.lobby.LobbyTournamentAPI
 import de.bytemc.tournaments.lobby.collectives.player.CollectivesPlayer
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
 import org.spigotmc.event.player.PlayerSpawnLocationEvent
 
@@ -25,23 +27,39 @@ class CollectivesListener(private val collectivesImpl: CollectivesImpl) : Listen
         event.respawnLocation = collectivesImpl.config.spawnLocation
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    fun handleJoin(event: PlayerJoinEvent) {
+    @EventHandler
+    fun onDamage(event: EntityDamageEvent) {
+        if (event.entity is Player && event.cause == EntityDamageEvent.DamageCause.VOID) {
+            event.entity.teleport(collectivesImpl.config.spawnLocation)
+        }
+    }
+
+    @EventHandler
+    fun handleLogin(event: PlayerLoginEvent) {
         val player = event.player
-        event.joinMessage = null
 
         for (tournament in LobbyTournamentAPI.instance.tournaments()) {
             for (team in tournament.teams()) {
                 if (team.participants.any { it.uuid == player.uniqueId }) {
-                    val collPlayer = CollectivesPlayer(player, tournament)
+                    val collPlayer = CollectivesPlayer(player, tournament, false, collectivesImpl)
                     repository.addPlayer(collPlayer)
-                    collPlayer.update()
                     return
                 }
             }
         }
 
-        player.kickPlayer("Du bist in keinem Turnier")
+        event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, "§cDu bist in keinem Turnier")
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    fun handleJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        event.joinMessage = null
+
+        val collectivesPlayer = repository.findPlayer(player)!!
+        collectivesPlayer.update(collectivesImpl)
+        collectivesPlayer.join(collectivesImpl)
+        collectivesPlayer.findIsPlaying()
     }
 
     @EventHandler
@@ -85,6 +103,7 @@ class CollectivesListener(private val collectivesImpl: CollectivesImpl) : Listen
             CollectivesPlayer.ALL_PLAYERS_SLOT -> collectivesPlayer.allPlayers()
             CollectivesPlayer.ALL_TEAMS_SLOT -> collectivesPlayer.allTeams()
             CollectivesPlayer.BACK_TO_LOBBY_SLOT -> collectivesPlayer.backToLobby()
+            CollectivesPlayer.MATCHUPS_SLOT -> collectivesPlayer.matchups()
         }
     }
 

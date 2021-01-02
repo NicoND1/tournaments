@@ -11,10 +11,11 @@ import de.bytemc.tournaments.api.ITournament
 import de.bytemc.tournaments.api.TournamentState
 import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.common.protocol.PacketOutDeleteTournament
+import de.bytemc.tournaments.common.protocol.lobby.PacketOutSendToTournamentLobby
 import de.bytemc.tournaments.common.protocol.team.PacketOutAddTeamParticipant
 import de.bytemc.tournaments.common.protocol.team.PacketOutRemoveTeamParticipant
 import de.bytemc.tournaments.lobby.*
-import de.bytemc.tournaments.lobby.inventory.pairing.PairingInventory
+import eu.thesimplecloud.plugin.startup.CloudPlugin
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -42,7 +43,7 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
         setPairingItem()
         setTournamentLobbyItem()
 
-        if (tournament.creator().uuid == player.uniqueId) {
+        if (tournament.creator().uuid == player.uniqueId || player.hasPermission("tournament.manage.deleteall")) {
             setDeletionItem()
             setActionItem()
         }
@@ -90,8 +91,7 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
         if (tournament.state() == TournamentState.COLLECTING) {
             setItem(15, object : ClickableItem(PLAY_HEAD.setName(player.format("Turnier starten")).toItemStack()) {
                 override fun onClick(p0: Player, p1: ItemStack): ClickResult {
-                    tournament.setState(TournamentState.PLAYING)
-                    //tryStart() TODO: Uncomment after finished with testing
+                    tryStart()
                     return ClickResult.CANCEL
                 }
             })
@@ -120,8 +120,9 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
                     val bytePlayer = ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]
                     if (bytePlayer != null) player.sendMessage(bytePlayer.getPrefix("Lobby") + "Das Turnier hat noch nicht angefangen§8.")
                 } else {
-                    PairingInventory(tournament,
-                        ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]!!).open(player)
+                    //PairingInventory(tournament,
+                    //    ByteAPI.getInstance().bytePlayerManager.players[player.uniqueId]!!).open(player)
+                    EncountersInventory(player, tournament.currentRound()!!.encounters.toCollection(ArrayList()))
                 }
                 return ClickResult.CANCEL
             }
@@ -145,7 +146,8 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
 
                     val team = tournament.findTeam(p0.uniqueId)
                     val packet = if (team == null) {
-                        val freeTeam = tournament.teams().firstOrNull { aTeam -> aTeam.isEmpty() }
+                        val freeTeam = tournament.teams()
+                            .firstOrNull { aTeam -> aTeam.participants.size < tournament.settings().teamsOption.playersPerTeam }
                         if (freeTeam == null) {
                             if (bytePlayer != null) player.sendMessage(bytePlayer.getPrefix("Lobby") + "§7Kein freies Team gefunden§8.")
                             return ClickResult.CANCEL
@@ -197,7 +199,8 @@ class ManageInventory(val player: Player, val tournament: LobbyTournament) :
                 .setName(player.format("Gemeinsame Lobby"))
                 .toItemStack()) {
                 override fun onClick(player: Player, itemStack: ItemStack): ClickResult {
-
+                    val packet = PacketOutSendToTournamentLobby(tournament, player.uniqueId)
+                    CloudPlugin.instance.communicationClient.getConnection().sendUnitQuery(packet)
                     return ClickResult.CANCEL
                 }
             })

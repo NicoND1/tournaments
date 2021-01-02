@@ -6,35 +6,35 @@ import de.bytemc.tournaments.api.TournamentTeam
 import de.bytemc.tournaments.lobby.collectives.player.CollectivesPlayer
 import org.bukkit.scoreboard.Scoreboard
 import org.bukkit.scoreboard.Team
-import org.bukkit.util.ChatPaginator
-import java.util.stream.Collectors
 
 /**
  * @author Nico_ND1
  */
-class CollectivesScoreboard(private val collectivesPlayer: CollectivesPlayer) {
-
-    companion object {
-        private val colors = arrayOf("b", "d", "e", "f", "c")
-    }
+class CollectivesScoreboard(private val collectivesPlayer: CollectivesPlayer, collectives: ICollectives) {
 
     private val player = collectivesPlayer.player
     private val scoreboard = ByteScoreboardBuilder(player)
+    var joined = false
 
     init {
-        update()
+        update(collectives)
     }
 
-    fun update() {
+    fun update(collectives: ICollectives) {
         collectivesPlayer.bytePlayer.initialScoreboard()
         scoreboard.setLine(10, "§r", "§r")
         setCurrentRound()
         scoreboard.setLine(7, "§r§r", "§r")
         scoreboard.setLine(6, "§7Vorherige ", "§7Gegner:")
         writeTeamNames(5, previousTeams())
-        scoreboard.setBoard("${collectivesPlayer.color()}Turniere")
+        if (joined) setTablist(collectives)
+    }
 
-        setTablist()
+    fun join(collectives: ICollectives) {
+        joined = true
+
+        scoreboard.setBoard("${collectivesPlayer.color()}Turniere")
+        setTablist(collectives)
     }
 
     private fun previousTeams(): List<TournamentTeam> {
@@ -76,23 +76,20 @@ class CollectivesScoreboard(private val collectivesPlayer: CollectivesPlayer) {
             return
         }
 
+        val tournament = collectivesPlayer.tournament
+        val isMultiTeam = tournament.settings().teamsOption.playersPerTeam > 1
         var index = startIndex
-        val allNames = teams.flatMapIndexed { i: Int, team: TournamentTeam ->
-            team.participants.map { "${colors[i]}${it.name}" }
-        }.stream().collect(Collectors.joining(", "))
-
-        val paginated = ChatPaginator.wordWrap(allNames, 28)
-        for (i in paginated.indices) {
-            val page = paginated[i]
-            val prefix = if (page.length > 16) page.substring(0, 15) else page
-            val suffix = if (page.length > 16) page.substring(15) else "§r"
-
-            scoreboard.setLine(index--, prefix, suffix)
+        for (team in teams) {
+            if (isMultiTeam) {
+                scoreboard.setLine(index--, "#${team.id}", "§r")
+            } else {
+                val name = if (team.participants.isEmpty()) "-" else team.participants[0].name
+                scoreboard.setLine(index, name, "§r")
+            }
         }
-        scoreboard.setLine(index, "§r§r§r", "§r")
     }
 
-    private fun setTablist() {
+    private fun setTablist(collectives: ICollectives) {
         val scoreboard = player.scoreboard
         val tournament = collectivesPlayer.tournament
         val ownTeam = collectivesPlayer.getTeam()
@@ -101,12 +98,23 @@ class CollectivesScoreboard(private val collectivesPlayer: CollectivesPlayer) {
             val sameTeam = ownTeam == team
             val color = if (sameTeam) "§a" else "§e"
             val order = if (sameTeam) "000" else String.format("%04d", team.id)
+            val deadColor = if (sameTeam) "§a" else "§7"
+            val deadOrder = "${order}dead"
 
             val scoreboardTeam = getOrCreateTeam(scoreboard, order)
             scoreboardTeam.prefix = "#${team.id} $color"
 
+            val deadScoreboardTeam = getOrCreateTeam(scoreboard, deadOrder)
+            deadScoreboardTeam.prefix = "#${team.id} $deadColor"
+
             for (participant in team.participants) {
-                scoreboardTeam.addEntry(participant.name)
+                val player = collectives.repository().findPlayer(participant.uuid)
+                if (player != null && player.isPlaying) {
+                    scoreboardTeam.addEntry(participant.name)
+                } else {
+                    scoreboardTeam.removeEntry(participant.name)
+                    deadScoreboardTeam.addEntry(participant.name)
+                }
             }
         }
     }

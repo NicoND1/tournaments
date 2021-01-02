@@ -1,6 +1,6 @@
 package de.bytemc.tournaments.lobby.collectives.armorstand
 
-/*import org.bukkit.Bukkit
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.ArmorStand
@@ -12,7 +12,7 @@ import org.bukkit.util.EulerAngle
 class TopListArmorStand(private val section: ConfigurationSection) {
 
     val location = readLocation()
-    val eulerAngles: Array<EulerAngle> = readEulerAngles()
+    private val eulerAngles: Array<EulerAngle> = readEulerAngles()
 
     fun apply(armorStand: ArmorStand) {
         armorStand.teleport(location)
@@ -36,9 +36,8 @@ class TopListArmorStand(private val section: ConfigurationSection) {
     private fun readEulerAngles(): Array<EulerAngle> {
         val section = section.getConfigurationSection("pose")
         val array = arrayOfNulls<EulerAngle>(EulerAngleEnum.values().size)
-        for ((index, _) in section.withIndex()) {
-            //array[index] = readEulerAngle(section[index])
-            // TODO
+        for (key in section.getKeys(false)) {
+            array[key.toInt()] = readEulerAngle(section.getConfigurationSection(key))
         }
 
         return Array(array.size) { i -> array[i]!! }
@@ -60,4 +59,3 @@ class TopListArmorStand(private val section: ConfigurationSection) {
 
     }
 }
-*/

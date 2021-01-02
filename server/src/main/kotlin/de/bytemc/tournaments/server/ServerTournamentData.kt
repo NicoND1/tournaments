@@ -18,6 +18,7 @@ fun TournamentEncounter.broadcast(message: BroadcastMessage) {
 }
 
 fun TournamentTeam.broadcast(message: BroadcastMessage) {
+    if (!active) return
     for (participant in participants) {
         val cloudPlayer = CloudAPI.instance.getCloudPlayerManager().getCachedCloudPlayer(participant.uuid)
 
@@ -37,6 +38,11 @@ fun TournamentEncounter.setWinnerTeam(tournament: ServerTournament, winnerTeam: 
         winnerTeam))
     tournament.testRoundOver()
     tournament.moveToLobby(firstTeam, secondTeam)
+    if (winnerTeam == firstTeam) {
+        secondTeam.active = false
+    } else {
+        firstTeam.active = false
+    }
 }
 
 fun TournamentEncounter.handleError(tournament: ServerTournament) {

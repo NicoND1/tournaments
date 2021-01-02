@@ -15,7 +15,7 @@ import kotlin.math.pow
  */
 data class TournamentCreator(val uuid: UUID, val name: String)
 
-data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentParticipant>) {
+data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentParticipant>, var active: Boolean = true) {
     @JsonLibExclude
     val participantsLock = ReentrantLock()
 
@@ -37,6 +37,10 @@ data class TournamentTeam(val id: Int, val participants: ArrayList<TournamentPar
         return id
     }
 
+    override fun toString(): String {
+        return "TournamentTeam(id=$id, participants=$participants"
+    }
+
 }
 
 data class TournamentParticipant(val uuid: UUID, val name: String, val texture: PlayerTexture? = null) {
@@ -50,6 +54,10 @@ data class TournamentParticipant(val uuid: UUID, val name: String, val texture: 
 
     override fun hashCode(): Int {
         return uuid.hashCode()
+    }
+
+    override fun toString(): String {
+        return "TournamentParticipant(uuid=$uuid, name='$name')"
     }
 }
 

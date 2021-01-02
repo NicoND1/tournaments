@@ -114,7 +114,7 @@ class ServerTournamentAPI : AbstractTournamentAPI<ServerTournament>() {
     }
 
     override fun toString(): String {
-        return "ServerTournamentAPI(listeningConnections=$listeningConnections, games=$games, tournaments=$tournaments)"
+        return "ServerTournamentAPI(games=$games, tournaments=$tournaments)"
     }
 
     init {

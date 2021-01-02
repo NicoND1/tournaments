@@ -13,6 +13,9 @@ import java.util.*
 class LobbyCollectives(private val repository: ICollectivesRepository) : ICollectives {
     override fun repository() = repository
 
+    override fun handleStateUpdate(tournament: LobbyTournament) {
+    }
+
     override fun handleRoundStart(tournament: LobbyTournament) {
     }
 
